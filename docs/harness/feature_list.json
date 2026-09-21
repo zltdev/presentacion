@@ -1,0 +1,8 @@
+{
+ "meta": {
+  "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
+  "next_key": "PJW-001",
+  "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
+ },
+ "features": []
+}
