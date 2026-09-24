@@ -1,8 +1,30 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-001",
+  "next_key": "PJW-002",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
- "features": []
+ "features": [
+  {
+   "id": 1,
+   "key": "PJW-001",
+   "title": "Deploy y hosting de la presentación en el VPS",
+   "status": "pending",
+   "epic": "hosting",
+   "priority": "p1",
+   "horizon": "next",
+   "start_date": null,
+   "target_date": null,
+   "depends_on": [],
+   "branch": null,
+   "worktree": null,
+   "delivered_in_session": null,
+   "require_tests_to_close": false,
+   "acceptance": [],
+   "description": "Mover el hosting de proyectos.somoszlt.com (hoy GitHub Pages, repo público y sin auth) al VPS propio, para poder proteger /v2/ con login real y dejar de exponer el código. A especificar.",
+   "notes": "Claude no tiene acceso al VPS: la spec define qué hace Claudio y qué queda automatizado.",
+   "block_type": null,
+   "block_note": null
+  }
+ ]
 }
