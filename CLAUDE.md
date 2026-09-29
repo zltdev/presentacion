@@ -1,5 +1,19 @@
 # presentacion
 
+## Subir versiones nuevas (tarea rápida, sin feature en el harness)
+El usuario deja exports en la raíz del repo (o donde caigan) y dice a qué ruta van:
+- `ZLT-WEB-PRESENTACIONES N.html` → `index.html` (`/`)
+- `ZLT-WEB-V2-home N.html` → `v2/index.html`
+- `ZLT-WEB-V2-novedades N.html` → `v2/novedades/index.html`
+- PDFs → pisan el archivo existente en `brochures/` con el mismo nombre (confirmar cuál si no es obvio).
+
+Los exports NO traen el gate: insertar `<script src="/gate.js"></script>` justo
+después de `</title>` (binario, sin tocar line endings). En `v2/index.html`
+además `href="brochures/` → `href="/brochures/`. Chequear que los `#p-*` de
+novedades existan en `v2/index.html` y que los PDFs linkeados existan. Borrar el
+export, commit directo a `main`, push. GitHub Pages publica en ~1 min
+(proyectos.somoszlt.com); verificar con curl que el tamaño publicado coincide.
+
 ## Harness / sesiones  ← LEER AL ARRANCAR CADA SESIÓN
 El backlog vive en **`docs/harness/feature_list.json`**. Es la fuente única de qué
 está hecho / pendiente / bloqueado. Cada feature tiene una key incremental
