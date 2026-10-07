@@ -1,4 +1,4 @@
-/* Gate de acceso para proyectos.somoszlt.com (raiz y /v2/).
+/* Gate de acceso para proyectos.somoszlt.com.
    Client-side sobre un sitio estatico: frena a quien entra por la URL,
    no a quien mire el repo. Reemplazo real: PJW-001.
    Ni los mails ni la clave viajan en claro: sha256(salt+mail+":"+clave). */
