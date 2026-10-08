@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-012",
+  "next_key": "PJW-013",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -206,6 +206,25 @@
     "Un cambio en index.html en main llega al VPS en menos de 5 minutos",
     "Si desaparece una foto oculta o un texto corregido, aparece en la lista de avisos del admin",
     "Pages sigue publicando proyectos.somoszlt.com igual que antes"
+   ]
+  },
+  {
+   "key": "PJW-012",
+   "title": "Generación del PDF de una presentación",
+   "status": "pending",
+   "horizon": "next",
+   "priority": "p0",
+   "target_date": "2026-11-02",
+   "description": "Playwright (Chromium) en el VPS imprime la presentación renderizada con CSS de impresión: galerías expandidas, videos como miniatura + link, sin controles. Mide el tamaño resultante.",
+   "notes": "Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-007",
+    "PJW-003"
+   ],
+   "acceptance": [
+    "El PDF de una presentación de 4 secciones sale en menos de 60 s",
+    "Todas las fotos no ocultas aparecen en el PDF y ninguna oculta",
+    "Los videos aparecen como imagen con link clickeable"
    ]
   }
  ]
