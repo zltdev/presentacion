@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-005",
+  "next_key": "PJW-006",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -76,6 +76,25 @@
    "acceptance": [
     "Las migraciones corren desde cero y son idempotentes",
     "Test que crea una presentación, un override y un envío con sus contactos"
+   ]
+  },
+  {
+   "key": "PJW-005",
+   "title": "Login real con roles y destinos Presentar / Administrar",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p0",
+   "target_date": "2026-10-17",
+   "description": "Login único con elección 'Presentar' (/) o 'Administrar' (/admin). Argon2id, cookie de sesión httpOnly/Secure/SameSite=Lax, rate limit de intentos, logout. Roles: admin (Facu, todo + usuarios), presenter (CEO), editor (Conra, solo textos). Script para crear los 3 usuarios iniciales.",
+   "notes": "Web app de presentaciones (T4). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-004"
+   ],
+   "acceptance": [
+    "Sin sesión, /, /admin y /api/* redirigen al login o devuelven 401",
+    "El editor no puede crear presentaciones ni enviar PDFs (403 probado en tests)",
+    "Tras 5 intentos fallidos se bloquea temporalmente el login",
+    "Las claves se guardan solo como hash argon2id"
    ]
   }
  ]
