@@ -110,7 +110,7 @@
   {
    "key": "PJW-006",
    "title": "Parser del catálogo de index.html",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-17",
@@ -124,7 +124,9 @@
     "Los IDs no cambian si se re-parsea el mismo archivo",
     "Un cambio de texto en un elemento cambia solo el ID de ese elemento"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-006-catalog-parser",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-007",
