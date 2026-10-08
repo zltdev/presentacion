@@ -1,0 +1,26 @@
+name: app-tests
+on:
+  push:
+    branches: ['PJW-*', 'zltdev/webapp']
+    paths: ['app/**', '.github/workflows/app-tests.yml']
+  pull_request:
+    branches: ['zltdev/webapp']
+    paths: ['app/**', '.github/workflows/app-tests.yml']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        pkg: [server, web]
+    defaults:
+      run:
+        working-directory: app/${{ matrix.pkg }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/${{ matrix.pkg }}/package-lock.json
+      - run: npm ci
+      - run: npm test
