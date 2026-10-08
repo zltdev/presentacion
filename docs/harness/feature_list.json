@@ -40,7 +40,8 @@
     "npm test pasa en app/server y app/web",
     "La Action de tests corre y queda en verde en un PR contra zltdev/webapp",
     "git diff contra main no toca index.html, gate.js, brochures/ ni CNAME"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-003",
@@ -59,7 +60,8 @@
     "Un push a zltdev/webapp despliega solo y el endpoint /api/health devuelve la versión del commit",
     "Existe un backup de Postgres del día y se probó restaurarlo",
     "proyectos.somoszlt.com sigue respondiendo igual que antes"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-004",
@@ -76,7 +78,8 @@
    "acceptance": [
     "Las migraciones corren desde cero y son idempotentes",
     "Test que crea una presentación, un override y un envío con sus contactos"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-005",
@@ -95,7 +98,8 @@
     "El editor no puede crear presentaciones ni enviar PDFs (403 probado en tests)",
     "Tras 5 intentos fallidos se bloquea temporalmente el login",
     "Las claves se guardan solo como hash argon2id"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-006",
@@ -113,7 +117,8 @@
     "Sobre el index.html real detecta las 27 secciones y las 11 fotos de p-pivm",
     "Los IDs no cambian si se re-parsea el mismo archivo",
     "Un cambio de texto en un elemento cambia solo el ID de ese elemento"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-007",
@@ -133,7 +138,8 @@
     "El HTML renderizado no incluye gate.js ni las secciones ocultas",
     "Un override aparece en el render y el texto original no",
     "Snapshot test de una presentación de ejemplo"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-008",
@@ -152,7 +158,8 @@
     "Duplicar copia secciones, orden, ocultos e idioma",
     "Funciona en notebook y tablet",
     "'Web completa' existe siempre, muestra todo index.html y no se puede borrar"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-009",
@@ -170,7 +177,8 @@
     "Conra edita un texto y se ve en todas las presentaciones",
     "index.html queda igual (hash sin cambios)",
     "'Volver al original' borra el override"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-010",
@@ -187,7 +195,8 @@
    "acceptance": [
     "El CEO abre una presentación y la recorre igual que la web actual (galerías, videos, mapa)",
     "El botón 'Enviar PDF' no aparece para el rol editor"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-011",
@@ -206,7 +215,8 @@
     "Un cambio en index.html en main llega al VPS en menos de 5 minutos",
     "Si desaparece una foto oculta o un texto corregido, aparece en la lista de avisos del admin",
     "Pages sigue publicando proyectos.somoszlt.com igual que antes"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-012",
@@ -225,7 +235,8 @@
     "El PDF de una presentación de 4 secciones sale en menos de 60 s",
     "Todas las fotos no ocultas aparecen en el PDF y ninguna oculta",
     "Los videos aparecen como imagen con link clickeable"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-013",
@@ -240,7 +251,8 @@
     "La app no tiene otros permisos de Graph",
     "Un envío de prueba desde la casilla del CEO funciona",
     "Un envío desde cualquier otra casilla falla (probado y documentado)"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-014",
@@ -262,7 +274,8 @@
     "Los correos quedan en contacts (sin duplicados) y el envío en sends",
     "Un PDF de más de 20 MB se envía como link que vence a los 30 días",
     "Correos inválidos se rechazan antes de enviar"
-   ]
+   ],
+   "epic": "H-016"
   },
   {
    "key": "PJW-015",
@@ -285,7 +298,8 @@
     "beta-proyectos.somoszlt.com redirige a proyectos.somoszlt.com",
     "Un export nuevo de index.html en main sigue llegando a la app (PJW-011) sin pasar por Pages",
     "CLAUDE.md actualizado y PJW-001 cerrada o vinculada"
-   ]
+   ],
+   "epic": "H-016"
   }
  ]
 }
