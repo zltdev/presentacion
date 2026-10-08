@@ -11,8 +11,8 @@ presentó a los correos que le den; esos correos quedan guardados.
 ## Reglas que no se negocian
 - **La web base no se toca.** `index.html` lo sigue produciendo Conra (marketing) con el
   flujo de siempre. La app lo lee; nunca lo reescribe.
-- **proyectos.somoszlt.com sigue activo todo el proceso** (GitHub Pages desde `main`).
-  Nada se pushea a `main` hasta el lanzamiento (T14).
+- **proyectos.somoszlt.com sigue activo en GitHub Pages hasta el lanzamiento** (T14).
+  Nada se pushea a `main` antes.
 - **La app de Azure solo sirve para esto:** permiso `Mail.Send` limitado por política de
   Exchange a la casilla del CEO. Nada de lectura de correo ni de otras casillas.
 - Repo público: secretos solo en variables de entorno del VPS / GitHub Secrets.
@@ -24,9 +24,13 @@ presentó a los correos que le den; esos correos quedan guardados.
 
 ## Infra (VPS Hostinger, en conjunto con el agente del repo de Hostinger)
 - Docker compose: Caddy (TLS) + API Node (Fastify) + Postgres. Backup diario de Postgres.
-- Dominio único: `presentaciones.somoszlt.com`. `/` presentar, `/admin` backoffice,
-  `/api` API. Todo servido por el VPS (sin Vercel: un solo deploy, el HTML de 27 MB no
-  pasa por intermediarios).
+- Dominio: durante el hito `beta-proyectos.somoszlt.com`. En el lanzamiento (T14)
+  `proyectos.somoszlt.com` pasa del GitHub Pages al VPS y `beta-` redirige.
+  `/` presentar, `/admin` backoffice, `/api` API, `/brochures/*.pdf` en las mismas rutas
+  de hoy. Todo servido por el VPS (sin Vercel: un solo deploy, el HTML de 27 MB no pasa
+  por intermediarios, y el plan gratis de Vercel no admite uso comercial).
+- Tras el lanzamiento la web original completa sigue disponible como presentación fija
+  "Web completa" (detrás del login). Este hito cubre el alcance de PJW-001.
 - CI: tests en cada PR/push; deploy al VPS en push a `zltdev/webapp` con tests en verde.
 
 ## Catálogo y render

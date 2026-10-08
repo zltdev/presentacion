@@ -1,20 +1,20 @@
 {
  "hito": {
-  "nombre": "Web app de presentaciones (presentaciones.somoszlt.com)",
-  "alcance": "Backoffice con login real donde el CEO arma presentaciones a partir de la web actual (index.html) eligiendo secciones, elementos (videos, fotos, textos), orden e idioma; las presenta en vivo y envía el PDF a los correos que le den, que quedan guardados. Conra corrige textos globales sin tocar la web base. Todo en el VPS Hostinger (Caddy + API Node + Postgres) bajo presentaciones.somoszlt.com, con / para presentar y /admin para el backoffice. Spec: docs/plan/webapp-spec.md. proyectos.somoszlt.com sigue activo en GitHub Pages durante todo el hito y nada va a main hasta el lanzamiento.",
+  "nombre": "Web app de presentaciones (proyectos.somoszlt.com)",
+  "alcance": "Backoffice con login real donde el CEO arma presentaciones a partir de la web actual (index.html) eligiendo secciones, elementos (videos, fotos, textos), orden e idioma; las presenta en vivo y envía el PDF a los correos que le den, que quedan guardados. Conra corrige textos globales sin tocar la web base. Todo en el VPS Hostinger (Caddy + API Node + Postgres): durante el hito en beta-proyectos.somoszlt.com; en el lanzamiento proyectos.somoszlt.com pasa al VPS con / para presentar y /admin para el backoffice. La web completa sigue disponible como presentación fija 'Web completa'. Cubre el alcance de PJW-001 (hosting en VPS con login real). Spec: docs/plan/webapp-spec.md. proyectos.somoszlt.com sigue activo en GitHub Pages hasta el lanzamiento y nada va a main antes.",
   "criterios": [
-   "El CEO entra a presentaciones.somoszlt.com, arma una presentación ocultando secciones y fotos puntuales, y la presenta en pantalla completa",
+   "El CEO entra a beta-proyectos.somoszlt.com (y proyectos.somoszlt.com tras el lanzamiento), arma una presentación ocultando secciones y fotos puntuales, y la presenta en pantalla completa",
    "Desde la presentación envía el PDF a 2+ correos; llega desde su casilla y los correos quedan en Postgres",
    "Conra corrige un texto en /admin y se ve en todas las presentaciones sin que cambie index.html",
    "Un export nuevo de index.html en main se refleja en la app y el admin muestra lo que dejó de coincidir",
    "La app de Azure no puede enviar desde ninguna casilla que no sea la del CEO (probado)",
-   "proyectos.somoszlt.com respondió con el sitio actual durante todo el hito"
+   "proyectos.somoszlt.com respondió con el sitio actual hasta el lanzamiento, y después sirve la app con los mismos links de /brochures/*.pdf"
   ],
   "entregables": [
    "Código en app/ (server + web) con tests en CI",
    "Stack docker compose en el VPS con TLS, deploy automático y backup diario de Postgres",
    "Registro de app de Azure con Mail.Send limitado a la casilla del CEO + script de verificación",
-   "GitHub Pages publicando solo el sitio estático, y webapp mergeada a main"
+   "Lanzamiento: DNS de proyectos.somoszlt.com en el VPS, webapp mergeada a main y GitHub Pages apagado"
   ],
   "start_date": "2026-10-08",
   "target_date": "2026-11-06"
@@ -37,13 +37,15 @@
   {
    "ref": "T2",
    "title": "Infra en VPS Hostinger: compose, DNS, TLS, deploy y backups",
-   "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS presentaciones.somoszlt.com (lo carga Facu). Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
+   "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS beta-proyectos.somoszlt.com (lo carga Facu); proyectos.somoszlt.com no se toca hasta T14. Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-14",
-   "depends_on": ["T1"],
+   "depends_on": [
+    "T1"
+   ],
    "acceptance": [
-    "https://presentaciones.somoszlt.com responde con certificado válido",
+    "https://beta-proyectos.somoszlt.com responde con certificado válido",
     "Un push a zltdev/webapp despliega solo y el endpoint /api/health devuelve la versión del commit",
     "Existe un backup de Postgres del día y se probó restaurarlo",
     "proyectos.somoszlt.com sigue respondiendo igual que antes"
@@ -56,7 +58,9 @@
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-14",
-   "depends_on": ["T1"],
+   "depends_on": [
+    "T1"
+   ],
    "acceptance": [
     "Las migraciones corren desde cero y son idempotentes",
     "Test que crea una presentación, un override y un envío con sus contactos"
@@ -69,7 +73,9 @@
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-17",
-   "depends_on": ["T3"],
+   "depends_on": [
+    "T3"
+   ],
    "acceptance": [
     "Sin sesión, /, /admin y /api/* redirigen al login o devuelven 401",
     "El editor no puede crear presentaciones ni enviar PDFs (403 probado en tests)",
@@ -84,7 +90,9 @@
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-17",
-   "depends_on": ["T1"],
+   "depends_on": [
+    "T1"
+   ],
    "acceptance": [
     "Sobre el index.html real detecta las 27 secciones y las 11 fotos de p-pivm",
     "Los IDs no cambian si se re-parsea el mismo archivo",
@@ -98,7 +106,10 @@
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-21",
-   "depends_on": ["T4", "T5"],
+   "depends_on": [
+    "T4",
+    "T5"
+   ],
    "acceptance": [
     "Una galería con 3 de 11 fotos ocultas muestra '1 / 8' y 8 puntos",
     "El HTML renderizado no incluye gate.js ni las secciones ocultas",
@@ -109,15 +120,18 @@
   {
    "ref": "T7",
    "title": "Admin: armar presentaciones",
-   "description": "En /admin: listar, crear, duplicar, renombrar y borrar presentaciones (compartidas entre todos). Elegir y ordenar secciones, ocultar elementos con miniaturas, elegir idioma, vista previa.",
+   "description": "En /admin: listar, crear, duplicar, renombrar y borrar presentaciones (compartidas entre todos). Elegir y ordenar secciones, ocultar elementos con miniaturas, elegir idioma, vista previa. Presentación fija 'Web completa' (todas las secciones, no se puede borrar ni editar) que reemplaza a la web original tras el lanzamiento.",
    "priority": "p0",
    "horizon": "now",
    "target_date": "2026-10-28",
-   "depends_on": ["T6"],
+   "depends_on": [
+    "T6"
+   ],
    "acceptance": [
     "El CEO arma una presentación de 4 secciones con fotos ocultas y la ve en vista previa",
     "Duplicar copia secciones, orden, ocultos e idioma",
-    "Funciona en notebook y tablet"
+    "Funciona en notebook y tablet",
+    "'Web completa' existe siempre, muestra todo index.html y no se puede borrar"
    ]
   },
   {
@@ -127,7 +141,9 @@
    "priority": "p1",
    "horizon": "next",
    "target_date": "2026-10-28",
-   "depends_on": ["T6"],
+   "depends_on": [
+    "T6"
+   ],
    "acceptance": [
     "Conra edita un texto y se ve en todas las presentaciones",
     "index.html queda igual (hash sin cambios)",
@@ -141,7 +157,9 @@
    "priority": "p0",
    "horizon": "next",
    "target_date": "2026-10-28",
-   "depends_on": ["T6"],
+   "depends_on": [
+    "T6"
+   ],
    "acceptance": [
     "El CEO abre una presentación y la recorre igual que la web actual (galerías, videos, mapa)",
     "El botón 'Enviar PDF' no aparece para el rol editor"
@@ -154,7 +172,10 @@
    "priority": "p1",
    "horizon": "next",
    "target_date": "2026-10-30",
-   "depends_on": ["T2", "T5"],
+   "depends_on": [
+    "T2",
+    "T5"
+   ],
    "acceptance": [
     "Un cambio en index.html en main llega al VPS en menos de 5 minutos",
     "Si desaparece una foto oculta o un texto corregido, aparece en la lista de avisos del admin",
@@ -168,7 +189,10 @@
    "priority": "p0",
    "horizon": "next",
    "target_date": "2026-11-02",
-   "depends_on": ["T6", "T2"],
+   "depends_on": [
+    "T6",
+    "T2"
+   ],
    "acceptance": [
     "El PDF de una presentación de 4 secciones sale en menos de 60 s",
     "Todas las fotos no ocultas aparecen en el PDF y ninguna oculta",
@@ -196,7 +220,12 @@
    "priority": "p0",
    "horizon": "next",
    "target_date": "2026-11-04",
-   "depends_on": ["T9", "T11", "T12", "T3"],
+   "depends_on": [
+    "T9",
+    "T11",
+    "T12",
+    "T3"
+   ],
    "acceptance": [
     "El CEO envía a 2 correos y llegan desde su casilla",
     "Los correos quedan en contacts (sin duplicados) y el envío en sends",
@@ -206,16 +235,23 @@
   },
   {
    "ref": "T14",
-   "title": "Lanzamiento: Pages solo estático y merge a main",
-   "description": "Con el OK de lanzamiento: cambiar GitHub Pages a deploy por Action que publique solo index.html, gate.js, brochures/, CNAME y assets, para que app/ no se exponga en proyectos.somoszlt.com. Luego merge de zltdev/webapp a main y verificación de ambos sitios.",
+   "title": "Lanzamiento: proyectos.somoszlt.com pasa al VPS",
+   "description": "Con el OK de lanzamiento: el VPS sirve también proyectos.somoszlt.com (TLS), con /brochures/*.pdf en las mismas rutas y los assets de la raíz (favicon, og-zlt.png, site.webmanifest). Cambio de DNS de proyectos al VPS (Facu), beta-proyectos redirige a proyectos. Merge de zltdev/webapp a main y apagado de GitHub Pages una vez verificado. Actualizar el flujo 'Subir versiones nuevas' del CLAUDE.md. Cerrar o vincular PJW-001.",
    "priority": "p1",
    "horizon": "later",
    "target_date": "2026-11-06",
-   "depends_on": ["T7", "T8", "T10", "T13"],
+   "depends_on": [
+    "T7",
+    "T8",
+    "T10",
+    "T13"
+   ],
    "acceptance": [
-    "proyectos.somoszlt.com publica igual que antes (mismo tamaño por curl) y /app/ da 404",
-    "presentaciones.somoszlt.com sigue funcionando después del merge",
-    "El flujo de 'subir versiones nuevas' del CLAUDE.md sigue valiendo y está actualizado"
+    "proyectos.somoszlt.com sirve la app con login; / presenta y /admin administra",
+    "Todos los /brochures/*.pdf responden 200 con el mismo tamaño que en Pages (curl)",
+    "beta-proyectos.somoszlt.com redirige a proyectos.somoszlt.com",
+    "Un export nuevo de index.html en main sigue llegando a la app (T10) sin pasar por Pages",
+    "CLAUDE.md actualizado y PJW-001 cerrada o vinculada"
    ]
   }
  ]
