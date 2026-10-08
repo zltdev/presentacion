@@ -12,3 +12,7 @@
 # Brochures fuente — en el repo solo van condo-funes.pdf y plazas-usa.pdf
 /Brochures/Brochure*.pdf
 /Brochures/Plazas USA*.pdf
+
+# Web app (app/)
+node_modules/
+dist/
