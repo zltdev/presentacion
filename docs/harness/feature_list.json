@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-013",
+  "next_key": "PJW-014",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -225,6 +225,21 @@
     "El PDF de una presentación de 4 secciones sale en menos de 60 s",
     "Todas las fotos no ocultas aparecen en el PDF y ninguna oculta",
     "Los videos aparecen como imagen con link clickeable"
+   ]
+  },
+  {
+   "key": "PJW-013",
+   "title": "App de Azure con Mail.Send limitado a la casilla del CEO",
+   "status": "pending",
+   "horizon": "next",
+   "priority": "p0",
+   "target_date": "2026-10-24",
+   "description": "Claude prepara el script/pasos y Facu (admin M365) los corre: registro de app con solo el permiso de aplicación Mail.Send, y política de Exchange (RBAC for Applications o ApplicationAccessPolicy) que limita el envío a la casilla del CEO. Secreto en env del VPS. La app sirve solo para esto.",
+   "notes": "Web app de presentaciones (T12). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Ver ERP-ZLT/docs/accesos/README.md (inventario de app registrations del tenant).",
+   "acceptance": [
+    "La app no tiene otros permisos de Graph",
+    "Un envío de prueba desde la casilla del CEO funciona",
+    "Un envío desde cualquier otra casilla falla (probado y documentado)"
    ]
   }
  ]
