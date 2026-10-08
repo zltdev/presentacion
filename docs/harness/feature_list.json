@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-011",
+  "next_key": "PJW-012",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -187,6 +187,25 @@
    "acceptance": [
     "El CEO abre una presentación y la recorre igual que la web actual (galerías, videos, mapa)",
     "El botón 'Enviar PDF' no aparece para el rol editor"
+   ]
+  },
+  {
+   "key": "PJW-011",
+   "title": "Sync de index.html desde main y aviso de cambios",
+   "status": "pending",
+   "horizon": "next",
+   "priority": "p1",
+   "target_date": "2026-10-30",
+   "description": "GitHub Action: en push a main que cambie index.html, subir el archivo al VPS y recargar el catálogo. El admin muestra qué elementos ocultos y textos corregidos dejaron de coincidir, para revisarlos. No modifica el flujo de Pages.",
+   "notes": "Web app de presentaciones (T10). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-003",
+    "PJW-006"
+   ],
+   "acceptance": [
+    "Un cambio en index.html en main llega al VPS en menos de 5 minutos",
+    "Si desaparece una foto oculta o un texto corregido, aparece en la lista de avisos del admin",
+    "Pages sigue publicando proyectos.somoszlt.com igual que antes"
    ]
   }
  ]
