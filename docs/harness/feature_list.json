@@ -69,7 +69,7 @@
   {
    "key": "PJW-004",
    "title": "Esquema de base de datos y migraciones",
-   "status": "in_progress",
+   "status": "done",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-14",
@@ -84,7 +84,8 @@
    ],
    "epic": "H-016",
    "branch": "PJW-004-db-schema",
-   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
+   "delivered_in_session": "a946e1ac-eb50-45b6-935f-844576d1d11c"
   },
   {
    "key": "PJW-005",
