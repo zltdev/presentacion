@@ -110,7 +110,7 @@
   {
    "key": "PJW-006",
    "title": "Parser del catálogo de index.html",
-   "status": "in_progress",
+   "status": "done",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-17",
@@ -126,17 +126,18 @@
    ],
    "epic": "H-016",
    "branch": "PJW-006-catalog-parser",
-   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
+   "delivered_in_session": "a946e1ac-eb50-45b6-935f-844576d1d11c"
   },
   {
    "key": "PJW-007",
    "title": "Motor de render de presentaciones",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-21",
    "description": "A partir de index.html + presentación: quitar y reordenar secciones, ocultar elementos, regenerar contador y puntos de galerías, aplicar text_overrides, fijar idioma, quitar gate.js. Sirve el HTML resultante detrás del login.",
-   "notes": "Web app de presentaciones (T6). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Web app de presentaciones (T6). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Se adelanta a PJW-005 (pedido de Facu, 2026-10-08): el motor de render se hace sin login; servirlo detrás del login se conecta en PJW-005.",
    "depends_on": [
     "PJW-005",
     "PJW-006"
@@ -147,7 +148,9 @@
     "Un override aparece en el render y el texto original no",
     "Snapshot test de una presentación de ejemplo"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-007-render",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-008",
