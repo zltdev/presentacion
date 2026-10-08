@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-002",
+  "next_key": "PJW-003",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -25,6 +25,22 @@
    "notes": "Claude no tiene acceso al VPS: la spec define qué hace Claudio y qué queda automatizado.",
    "block_type": null,
    "block_note": null
+  },
+  {
+   "key": "PJW-002",
+   "title": "Estructura de app/ y CI de tests",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p0",
+   "start_date": "2026-10-08",
+   "target_date": "2026-10-10",
+   "description": "Crear app/server (Node 22 + Fastify) y app/web (Vite + React) en la rama de integración zltdev/webapp, sin tocar index.html, gate.js ni brochures/. GitHub Action que corre lint + tests (vitest) en cada push/PR de ramas PJW-* y zltdev/webapp.",
+   "notes": "Web app de presentaciones (T1). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Nada va a main antes del lanzamiento.",
+   "acceptance": [
+    "npm test pasa en app/server y app/web",
+    "La Action de tests corre y queda en verde en un PR contra zltdev/webapp",
+    "git diff contra main no toca index.html, gate.js, brochures/ ni CNAME"
+   ]
   }
  ]
 }
