@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-015",
+  "next_key": "PJW-016",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -262,6 +262,29 @@
     "Los correos quedan en contacts (sin duplicados) y el envío en sends",
     "Un PDF de más de 20 MB se envía como link que vence a los 30 días",
     "Correos inválidos se rechazan antes de enviar"
+   ]
+  },
+  {
+   "key": "PJW-015",
+   "title": "Lanzamiento: proyectos.somoszlt.com pasa al VPS",
+   "status": "pending",
+   "horizon": "later",
+   "priority": "p1",
+   "target_date": "2026-11-06",
+   "description": "Con el OK de lanzamiento: el VPS sirve también proyectos.somoszlt.com (TLS), con /brochures/*.pdf en las mismas rutas y los assets de la raíz (favicon, og-zlt.png, site.webmanifest). Cambio de DNS de proyectos al VPS (Facu), beta-proyectos redirige a proyectos. Merge de zltdev/webapp a main y apagado de GitHub Pages una vez verificado. Actualizar el flujo 'Subir versiones nuevas' del CLAUDE.md. Cerrar o vincular PJW-001.",
+   "notes": "Web app de presentaciones (T14). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Cubre el alcance de PJW-001.",
+   "depends_on": [
+    "PJW-008",
+    "PJW-009",
+    "PJW-011",
+    "PJW-014"
+   ],
+   "acceptance": [
+    "proyectos.somoszlt.com sirve la app con login; / presenta y /admin administra",
+    "Todos los /brochures/*.pdf responden 200 con el mismo tamaño que en Pages (curl)",
+    "beta-proyectos.somoszlt.com redirige a proyectos.somoszlt.com",
+    "Un export nuevo de index.html en main sigue llegando a la app (PJW-011) sin pasar por Pages",
+    "CLAUDE.md actualizado y PJW-001 cerrada o vinculada"
    ]
   }
  ]
