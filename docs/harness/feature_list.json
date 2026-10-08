@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-007",
+  "next_key": "PJW-008",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -113,6 +113,26 @@
     "Sobre el index.html real detecta las 27 secciones y las 11 fotos de p-pivm",
     "Los IDs no cambian si se re-parsea el mismo archivo",
     "Un cambio de texto en un elemento cambia solo el ID de ese elemento"
+   ]
+  },
+  {
+   "key": "PJW-007",
+   "title": "Motor de render de presentaciones",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p0",
+   "target_date": "2026-10-21",
+   "description": "A partir de index.html + presentación: quitar y reordenar secciones, ocultar elementos, regenerar contador y puntos de galerías, aplicar text_overrides, fijar idioma, quitar gate.js. Sirve el HTML resultante detrás del login.",
+   "notes": "Web app de presentaciones (T6). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-005",
+    "PJW-006"
+   ],
+   "acceptance": [
+    "Una galería con 3 de 11 fotos ocultas muestra '1 / 8' y 8 puntos",
+    "El HTML renderizado no incluye gate.js ni las secciones ocultas",
+    "Un override aparece en el render y el texto original no",
+    "Snapshot test de una presentación de ejemplo"
    ]
   }
  ]
