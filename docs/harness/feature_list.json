@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-014",
+  "next_key": "PJW-015",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -240,6 +240,28 @@
     "La app no tiene otros permisos de Graph",
     "Un envío de prueba desde la casilla del CEO funciona",
     "Un envío desde cualquier otra casilla falla (probado y documentado)"
+   ]
+  },
+  {
+   "key": "PJW-014",
+   "title": "Envío del PDF por mail y registro de correos",
+   "status": "pending",
+   "horizon": "next",
+   "priority": "p0",
+   "target_date": "2026-11-04",
+   "description": "Modal en la vista de presentador: cargar 1+ correos, enviar. Sale por Graph desde la casilla del CEO; hasta ~20 MB va adjunto, si no, link de descarga firmado que vence a los 30 días. Guarda contacts y sends en Postgres; lista de envíos en /admin.",
+   "notes": "Web app de presentaciones (T13). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-010",
+    "PJW-012",
+    "PJW-013",
+    "PJW-004"
+   ],
+   "acceptance": [
+    "El CEO envía a 2 correos y llegan desde su casilla",
+    "Los correos quedan en contacts (sin duplicados) y el envío en sends",
+    "Un PDF de más de 20 MB se envía como link que vence a los 30 días",
+    "Correos inválidos se rechazan antes de enviar"
    ]
   }
  ]
