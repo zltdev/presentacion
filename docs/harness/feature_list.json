@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-003",
+  "next_key": "PJW-004",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -40,6 +40,25 @@
     "npm test pasa en app/server y app/web",
     "La Action de tests corre y queda en verde en un PR contra zltdev/webapp",
     "git diff contra main no toca index.html, gate.js, brochures/ ni CNAME"
+   ]
+  },
+  {
+   "key": "PJW-003",
+   "title": "Infra en VPS Hostinger: compose, DNS, TLS, deploy y backups",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p0",
+   "target_date": "2026-10-14",
+   "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS beta-proyectos.somoszlt.com (lo carga Facu); proyectos.somoszlt.com no se toca hasta el lanzamiento. Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
+   "notes": "Web app de presentaciones (T2). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "depends_on": [
+    "PJW-002"
+   ],
+   "acceptance": [
+    "https://beta-proyectos.somoszlt.com responde con certificado válido",
+    "Un push a zltdev/webapp despliega solo y el endpoint /api/health devuelve la versión del commit",
+    "Existe un backup de Postgres del día y se probó restaurarlo",
+    "proyectos.somoszlt.com sigue respondiendo igual que antes"
    ]
   }
  ]
