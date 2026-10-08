@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`presentación de ejemplo (resumen estructural) 1`] = `
+{
+  "menu": [
+    "#hero",
+    "#p-pivm",
+    "#p-plazasusa",
+  ],
+  "resumen": [
+    {
+      "contador": "1 / 5",
+      "fotos": 5,
+      "id": "p-plazasusa",
+    },
+    {
+      "contador": "",
+      "fotos": 0,
+      "id": "hero",
+    },
+    {
+      "contador": "1 / 8",
+      "fotos": 8,
+      "id": "p-pivm",
+    },
+  ],
+}
+`;
