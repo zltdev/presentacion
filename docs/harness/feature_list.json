@@ -69,7 +69,7 @@
   {
    "key": "PJW-004",
    "title": "Esquema de base de datos y migraciones",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-14",
@@ -82,7 +82,9 @@
     "Las migraciones corren desde cero y son idempotentes",
     "Test que crea una presentación, un override y un envío con sus contactos"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-004-db-schema",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-005",
