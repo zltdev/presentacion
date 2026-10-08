@@ -1,0 +1,222 @@
+{
+ "hito": {
+  "nombre": "Web app de presentaciones (presentaciones.somoszlt.com)",
+  "alcance": "Backoffice con login real donde el CEO arma presentaciones a partir de la web actual (index.html) eligiendo secciones, elementos (videos, fotos, textos), orden e idioma; las presenta en vivo y envía el PDF a los correos que le den, que quedan guardados. Conra corrige textos globales sin tocar la web base. Todo en el VPS Hostinger (Caddy + API Node + Postgres) bajo presentaciones.somoszlt.com, con / para presentar y /admin para el backoffice. Spec: docs/plan/webapp-spec.md. proyectos.somoszlt.com sigue activo en GitHub Pages durante todo el hito y nada va a main hasta el lanzamiento.",
+  "criterios": [
+   "El CEO entra a presentaciones.somoszlt.com, arma una presentación ocultando secciones y fotos puntuales, y la presenta en pantalla completa",
+   "Desde la presentación envía el PDF a 2+ correos; llega desde su casilla y los correos quedan en Postgres",
+   "Conra corrige un texto en /admin y se ve en todas las presentaciones sin que cambie index.html",
+   "Un export nuevo de index.html en main se refleja en la app y el admin muestra lo que dejó de coincidir",
+   "La app de Azure no puede enviar desde ninguna casilla que no sea la del CEO (probado)",
+   "proyectos.somoszlt.com respondió con el sitio actual durante todo el hito"
+  ],
+  "entregables": [
+   "Código en app/ (server + web) con tests en CI",
+   "Stack docker compose en el VPS con TLS, deploy automático y backup diario de Postgres",
+   "Registro de app de Azure con Mail.Send limitado a la casilla del CEO + script de verificación",
+   "GitHub Pages publicando solo el sitio estático, y webapp mergeada a main"
+  ],
+  "start_date": "2026-10-08",
+  "target_date": "2026-11-06"
+ },
+ "tareas": [
+  {
+   "ref": "T1",
+   "title": "Estructura de app/ y CI de tests",
+   "description": "Crear app/server (Node 22 + Fastify) y app/web (Vite + React) en la rama de integración zltdev/webapp, sin tocar index.html, gate.js ni brochures/. GitHub Action que corre lint + tests (vitest) en cada push/PR de ramas PJW-* y zltdev/webapp.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-10",
+   "depends_on": [],
+   "acceptance": [
+    "npm test pasa en app/server y app/web",
+    "La Action de tests corre y queda en verde en un PR contra zltdev/webapp",
+    "git diff contra main no toca index.html, gate.js, brochures/ ni CNAME"
+   ]
+  },
+  {
+   "ref": "T2",
+   "title": "Infra en VPS Hostinger: compose, DNS, TLS, deploy y backups",
+   "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS presentaciones.somoszlt.com (lo carga Facu). Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-14",
+   "depends_on": ["T1"],
+   "acceptance": [
+    "https://presentaciones.somoszlt.com responde con certificado válido",
+    "Un push a zltdev/webapp despliega solo y el endpoint /api/health devuelve la versión del commit",
+    "Existe un backup de Postgres del día y se probó restaurarlo",
+    "proyectos.somoszlt.com sigue respondiendo igual que antes"
+   ]
+  },
+  {
+   "ref": "T3",
+   "title": "Esquema de base de datos y migraciones",
+   "description": "Migraciones Postgres: users (rol admin|presenter|editor), sessions, presentations (nombre, idioma, secciones ordenadas, elementos ocultos, autor, fechas), text_overrides (element_id, idioma, texto, hash del original), contacts (email único), sends (presentación, usuario, destinatarios, tamaño PDF, modo adjunto|link, estado, fecha). Migraciones corren solas en el deploy.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-14",
+   "depends_on": ["T1"],
+   "acceptance": [
+    "Las migraciones corren desde cero y son idempotentes",
+    "Test que crea una presentación, un override y un envío con sus contactos"
+   ]
+  },
+  {
+   "ref": "T4",
+   "title": "Login real con roles y destinos Presentar / Administrar",
+   "description": "Login único con elección 'Presentar' (/) o 'Administrar' (/admin). Argon2id, cookie de sesión httpOnly/Secure/SameSite=Lax, rate limit de intentos, logout. Roles: admin (Facu, todo + usuarios), presenter (CEO), editor (Conra, solo textos). Script para crear los 3 usuarios iniciales.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-17",
+   "depends_on": ["T3"],
+   "acceptance": [
+    "Sin sesión, /, /admin y /api/* redirigen al login o devuelven 401",
+    "El editor no puede crear presentaciones ni enviar PDFs (403 probado en tests)",
+    "Tras 5 intentos fallidos se bloquea temporalmente el login",
+    "Las claves se guardan solo como hash argon2id"
+   ]
+  },
+  {
+   "ref": "T5",
+   "title": "Parser del catálogo de index.html",
+   "description": "Leer index.html y armar el catálogo: secciones (<section id>) y elementos dentro (video .pvideo, cada foto .gslide, textos .prose y bloques l-es/l-en, partners .accompany, etapas .stages, brochure). ID estable = sección + tipo + hash del contenido. Miniaturas livianas para el admin.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-17",
+   "depends_on": ["T1"],
+   "acceptance": [
+    "Sobre el index.html real detecta las 27 secciones y las 11 fotos de p-pivm",
+    "Los IDs no cambian si se re-parsea el mismo archivo",
+    "Un cambio de texto en un elemento cambia solo el ID de ese elemento"
+   ]
+  },
+  {
+   "ref": "T6",
+   "title": "Motor de render de presentaciones",
+   "description": "A partir de index.html + presentación: quitar y reordenar secciones, ocultar elementos, regenerar contador y puntos de galerías, aplicar text_overrides, fijar idioma, quitar gate.js. Sirve el HTML resultante detrás del login.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-21",
+   "depends_on": ["T4", "T5"],
+   "acceptance": [
+    "Una galería con 3 de 11 fotos ocultas muestra '1 / 8' y 8 puntos",
+    "El HTML renderizado no incluye gate.js ni las secciones ocultas",
+    "Un override aparece en el render y el texto original no",
+    "Snapshot test de una presentación de ejemplo"
+   ]
+  },
+  {
+   "ref": "T7",
+   "title": "Admin: armar presentaciones",
+   "description": "En /admin: listar, crear, duplicar, renombrar y borrar presentaciones (compartidas entre todos). Elegir y ordenar secciones, ocultar elementos con miniaturas, elegir idioma, vista previa.",
+   "priority": "p0",
+   "horizon": "now",
+   "target_date": "2026-10-28",
+   "depends_on": ["T6"],
+   "acceptance": [
+    "El CEO arma una presentación de 4 secciones con fotos ocultas y la ve en vista previa",
+    "Duplicar copia secciones, orden, ocultos e idioma",
+    "Funciona en notebook y tablet"
+   ]
+  },
+  {
+   "ref": "T8",
+   "title": "Admin: editor de textos globales",
+   "description": "Pantalla para que el editor (Conra) y el admin corrijan textos por elemento e idioma. Guarda el override con el hash del texto original; nunca modifica index.html. Permite volver al original.",
+   "priority": "p1",
+   "horizon": "next",
+   "target_date": "2026-10-28",
+   "depends_on": ["T6"],
+   "acceptance": [
+    "Conra edita un texto y se ve en todas las presentaciones",
+    "index.html queda igual (hash sin cambios)",
+    "'Volver al original' borra el override"
+   ]
+  },
+  {
+   "ref": "T9",
+   "title": "Vista de presentador",
+   "description": "En /: lista de presentaciones, abrir una a pantalla completa, botón discreto 'Enviar PDF' que abre el modal de T13.",
+   "priority": "p0",
+   "horizon": "next",
+   "target_date": "2026-10-28",
+   "depends_on": ["T6"],
+   "acceptance": [
+    "El CEO abre una presentación y la recorre igual que la web actual (galerías, videos, mapa)",
+    "El botón 'Enviar PDF' no aparece para el rol editor"
+   ]
+  },
+  {
+   "ref": "T10",
+   "title": "Sync de index.html desde main y aviso de cambios",
+   "description": "GitHub Action: en push a main que cambie index.html, subir el archivo al VPS y recargar el catálogo. El admin muestra qué elementos ocultos y textos corregidos dejaron de coincidir, para revisarlos. No modifica el flujo de Pages.",
+   "priority": "p1",
+   "horizon": "next",
+   "target_date": "2026-10-30",
+   "depends_on": ["T2", "T5"],
+   "acceptance": [
+    "Un cambio en index.html en main llega al VPS en menos de 5 minutos",
+    "Si desaparece una foto oculta o un texto corregido, aparece en la lista de avisos del admin",
+    "Pages sigue publicando proyectos.somoszlt.com igual que antes"
+   ]
+  },
+  {
+   "ref": "T11",
+   "title": "Generación del PDF de una presentación",
+   "description": "Playwright (Chromium) en el VPS imprime la presentación renderizada con CSS de impresión: galerías expandidas, videos como miniatura + link, sin controles. Mide el tamaño resultante.",
+   "priority": "p0",
+   "horizon": "next",
+   "target_date": "2026-11-02",
+   "depends_on": ["T6", "T2"],
+   "acceptance": [
+    "El PDF de una presentación de 4 secciones sale en menos de 60 s",
+    "Todas las fotos no ocultas aparecen en el PDF y ninguna oculta",
+    "Los videos aparecen como imagen con link clickeable"
+   ]
+  },
+  {
+   "ref": "T12",
+   "title": "App de Azure con Mail.Send limitado a la casilla del CEO",
+   "description": "Claude prepara el script/pasos y Facu (admin M365) los corre: registro de app con solo el permiso de aplicación Mail.Send, y política de Exchange (RBAC for Applications o ApplicationAccessPolicy) que limita el envío a la casilla del CEO. Secreto en env del VPS. La app sirve solo para esto.",
+   "priority": "p0",
+   "horizon": "next",
+   "target_date": "2026-10-24",
+   "depends_on": [],
+   "acceptance": [
+    "La app no tiene otros permisos de Graph",
+    "Un envío de prueba desde la casilla del CEO funciona",
+    "Un envío desde cualquier otra casilla falla (probado y documentado)"
+   ]
+  },
+  {
+   "ref": "T13",
+   "title": "Envío del PDF por mail y registro de correos",
+   "description": "Modal en la vista de presentador: cargar 1+ correos, enviar. Sale por Graph desde la casilla del CEO; hasta ~20 MB va adjunto, si no, link de descarga firmado que vence a los 30 días. Guarda contacts y sends en Postgres; lista de envíos en /admin.",
+   "priority": "p0",
+   "horizon": "next",
+   "target_date": "2026-11-04",
+   "depends_on": ["T9", "T11", "T12", "T3"],
+   "acceptance": [
+    "El CEO envía a 2 correos y llegan desde su casilla",
+    "Los correos quedan en contacts (sin duplicados) y el envío en sends",
+    "Un PDF de más de 20 MB se envía como link que vence a los 30 días",
+    "Correos inválidos se rechazan antes de enviar"
+   ]
+  },
+  {
+   "ref": "T14",
+   "title": "Lanzamiento: Pages solo estático y merge a main",
+   "description": "Con el OK de lanzamiento: cambiar GitHub Pages a deploy por Action que publique solo index.html, gate.js, brochures/, CNAME y assets, para que app/ no se exponga en proyectos.somoszlt.com. Luego merge de zltdev/webapp a main y verificación de ambos sitios.",
+   "priority": "p1",
+   "horizon": "later",
+   "target_date": "2026-11-06",
+   "depends_on": ["T7", "T8", "T10", "T13"],
+   "acceptance": [
+    "proyectos.somoszlt.com publica igual que antes (mismo tamaño por curl) y /app/ da 404",
+    "presentaciones.somoszlt.com sigue funcionando después del merge",
+    "El flujo de 'subir versiones nuevas' del CLAUDE.md sigue valiendo y está actualizado"
+   ]
+  }
+ ]
+}
