@@ -29,7 +29,7 @@
   {
    "key": "PJW-002",
    "title": "Estructura de app/ y CI de tests",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "start_date": "2026-10-08",
@@ -41,7 +41,9 @@
     "La Action de tests corre y queda en verde en un PR contra zltdev/webapp",
     "git diff contra main no toca index.html, gate.js, brochures/ ni CNAME"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-002-app-scaffold",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-003",
