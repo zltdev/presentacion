@@ -49,12 +49,12 @@
   {
    "key": "PJW-003",
    "title": "Infra en VPS Hostinger: compose, DNS, TLS, deploy y backups",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-14",
    "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS beta-proyectos.somoszlt.com (lo carga Facu); proyectos.somoszlt.com no se toca hasta el lanzamiento. Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
-   "notes": "Web app de presentaciones (T2). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Web app de presentaciones (T2). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. 2026-10-09: deploy por Dokploy (no GitHub Actions/SSH), dominio beta-proyectos.zltdesarrollos.com; mientras no hay DNS, preview en *.sslip.io. Ver docs/plan/vps-claudio.md.",
    "depends_on": [
     "PJW-002"
    ],
@@ -64,7 +64,9 @@
     "Existe un backup de Postgres del día y se probó restaurarlo",
     "proyectos.somoszlt.com sigue respondiendo igual que antes"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-003-vps-deploy",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-004",
