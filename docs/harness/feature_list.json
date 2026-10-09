@@ -90,12 +90,12 @@
   {
    "key": "PJW-005",
    "title": "Login real con roles y destinos Presentar / Administrar",
-   "status": "in_progress",
+   "status": "done",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-17",
    "description": "Login único con elección 'Presentar' (/) o 'Administrar' (/admin). Argon2id, cookie de sesión httpOnly/Secure/SameSite=Lax, rate limit de intentos, logout. Roles: admin (Facu, todo + usuarios), presenter (CEO), editor (Conra, solo textos). Script para crear los 3 usuarios iniciales.",
-   "notes": "Web app de presentaciones (T4). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Web app de presentaciones (T4). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Cerrada con PR #5. Los 3 usuarios reales se crean en el VPS con npm run create-user (PJW-003).",
    "depends_on": [
     "PJW-004"
    ],
@@ -107,7 +107,8 @@
    ],
    "epic": "H-016",
    "branch": "PJW-005-login",
-   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
+   "delivered_in_session": "a946e1ac-eb50-45b6-935f-844576d1d11c"
   },
   {
    "key": "PJW-006",
