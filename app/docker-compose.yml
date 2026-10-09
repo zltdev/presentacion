@@ -49,9 +49,10 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
+        set -o pipefail # si pg_dump falla, que no quede un .gz vacío como "ok"
         while true; do
           f=/backups/zlt-$$(date +%Y%m%d-%H%M).sql.gz
-          pg_dump -h db -U zlt zlt | gzip > $$f && echo "backup ok $$f" || echo "backup FALLÓ"
+          pg_dump -h db -U zlt zlt | gzip > $$f && echo "backup ok $$f" || { echo "backup FALLÓ"; rm -f $$f; }
           find /backups -name 'zlt-*.sql.gz' -mtime +14 -delete
           sleep 86400
         done
