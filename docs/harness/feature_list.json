@@ -90,7 +90,7 @@
   {
    "key": "PJW-005",
    "title": "Login real con roles y destinos Presentar / Administrar",
-   "status": "pending",
+   "status": "in_progress",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-17",
@@ -105,7 +105,9 @@
     "Tras 5 intentos fallidos se bloquea temporalmente el login",
     "Las claves se guardan solo como hash argon2id"
    ],
-   "epic": "H-016"
+   "epic": "H-016",
+   "branch": "PJW-005-login",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp"
   },
   {
    "key": "PJW-006",
