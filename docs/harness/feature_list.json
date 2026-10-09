@@ -54,7 +54,7 @@
    "priority": "p0",
    "target_date": "2026-10-14",
    "description": "Junto con el agente del repo de Hostinger: docker compose con Caddy (TLS automático), API y Postgres en el VPS. Registro DNS beta-proyectos.somoszlt.com (lo carga Facu); proyectos.somoszlt.com no se toca hasta el lanzamiento. Action de deploy en push a zltdev/webapp tras tests en verde. Backup diario de Postgres con retención de 14 días. Secretos solo en GitHub Secrets / env del VPS.",
-   "notes": "Web app de presentaciones (T2). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. 2026-10-09: deploy por Dokploy (no GitHub Actions/SSH), dominio beta-proyectos.zltdesarrollos.com; mientras no hay DNS, preview en *.sslip.io. Ver docs/plan/vps-claudio.md.",
+   "notes": "Web app de presentaciones (T2). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. 2026-10-09: deploy por Dokploy (no GitHub Actions/SSH), dominio beta-proyectos.zltdesarrollos.com; mientras no hay DNS, preview en *.sslip.io. Ver docs/plan/vps-claudio.md. Código mergeado (PR #6). Falta: crear la app en Dokploy (Facu/Claudio), deploy en sslip.io, backup restaurado de prueba.",
    "depends_on": [
     "PJW-002"
    ],
@@ -243,7 +243,7 @@
    "priority": "p0",
    "target_date": "2026-11-02",
    "description": "Playwright (Chromium) en el VPS imprime la presentación renderizada con CSS de impresión: galerías expandidas, videos como miniatura + link, sin controles. Mide el tamaño resultante.",
-   "notes": "Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Revisión hostinger-48 (2026-10-09): la imagen no trae Chromium ni sus libs; subir mem_limit de app a ~1.5g; escribir PDFs en /tmp (WORKDIR es de root, la app corre como node).",
    "depends_on": [
     "PJW-007",
     "PJW-003"
