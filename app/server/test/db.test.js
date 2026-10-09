@@ -46,6 +46,6 @@ test('las restricciones rechazan datos inválidos', async () => {
   await expect(db.query("INSERT INTO users (email, name, role, password_hash) VALUES ('x@y.com', 'X', 'superuser', 'x')")).rejects.toThrow()
   await expect(db.query("INSERT INTO contacts (email) VALUES ('Mayus@Cliente.com')")).rejects.toThrow()
   await expect(db.query("INSERT INTO presentations (name, lang) VALUES ('X', 'fr')")).rejects.toThrow()
-  await db.query("INSERT INTO presentations (name, is_fixed) VALUES ('Web completa', true)")
+  // la migración 002 ya crea "Web completa": no puede haber otra fija
   await expect(db.query("INSERT INTO presentations (name, is_fixed) VALUES ('Otra fija', true)")).rejects.toThrow()
 })
