@@ -48,7 +48,7 @@ sysctl vm.swappiness=10 && echo 'vm.swappiness=10' > /etc/sysctl.d/99-swappiness
 - Conectar Dokploy al repo `zltdev/presentacion`, rama `zltdev/webapp`, con auto-deploy por
   webhook. Es el primer proyecto del VPS que despliega desde git: requiere autorizar la GitHub
   App de Dokploy sobre ese repo.
-- Dominio: Facu crea primero el A record `beta-proyectos.somoszlt.com → 2.25.176.236`; recién
+- Dominio: Facu crea primero el A record `beta-proyectos.zltdesarrollos.com → 2.25.176.236`; recién
   después se carga el dominio en Dokploy (si se carga antes, ACME queda en backoff y hay que
   reiniciar `dokploy-traefik`).
 - Backup diario del Postgres de la app, retención 14 días.
