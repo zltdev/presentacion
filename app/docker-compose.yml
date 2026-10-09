@@ -1,0 +1,67 @@
+# Web app de proyectos en el VPS (Dokploy). Variables en Dokploy: POSTGRES_PASSWORD (solo A-Za-z0-9: va dentro de una URL).
+# El dominio (Traefik + TLS) se configura en la UI de Dokploy apuntando a app:3000.
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: app/Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://zlt:${POSTGRES_PASSWORD}@db:5432/zlt
+      NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 1g
+    shm_size: 256m # Chromium de los PDFs (PJW-012)
+    expose: ["3000"]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 15s
+      start_period: 60s # el primer arranque corre migraciones
+      retries: 3
+    networks: [default, dokploy-network]
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zlt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: zlt
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zlt -d zlt"]
+      interval: 10s
+      retries: 5
+    mem_limit: 512m
+
+  # Backup diario de Postgres, retención 14 días
+  backup:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes: [backups:/backups]
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -o pipefail # si pg_dump falla, que no quede un .gz vacío como "ok"
+        while true; do
+          f=/backups/zlt-$$(date +%Y%m%d-%H%M).sql.gz
+          pg_dump -h db -U zlt zlt | gzip > $$f && echo "backup ok $$f" || { echo "backup FALLÓ"; rm -f $$f; }
+          find /backups -name 'zlt-*.sql.gz' -mtime +14 -delete
+          sleep 86400
+        done
+    mem_limit: 128m
+
+volumes:
+  pgdata:
+  backups:
+
+networks:
+  dokploy-network:
+    external: true

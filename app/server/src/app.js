@@ -8,9 +8,9 @@ import { renderPresentation } from './render.js'
 const PUBLIC_API = new Set(['/api/health', '/api/login'])
 
 // opts: db (pg.Pool), baseHtmlPath (index.html), webDist (build de app/web), brochuresDir,
-//       secureCookies (true en producción), logger
-export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCookies = true, logger } = {}) {
-  const app = Fastify({ logger })
+//       secureCookies (true en producción), trustProxy (detrás de Traefik), logger
+export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCookies = true, trustProxy = false, logger } = {}) {
+  const app = Fastify({ logger, trustProxy })
   app.register(cookie)
 
   app.addHook('onRequest', async (req, reply) => {

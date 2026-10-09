@@ -24,3 +24,23 @@ jobs:
           cache-dependency-path: app/${{ matrix.pkg }}/package-lock.json
       - run: npm ci
       - run: npm test
+
+  # La imagen construye y el stack levanta sano (app + Postgres), igual que en Dokploy
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker network create dokploy-network
+      - run: docker compose -f app/docker-compose.yml up -d --build --wait --wait-timeout 180
+        env:
+          POSTGRES_PASSWORD: ci-test
+      - run: |
+          docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/api/health').then(r => r.json()).then(j => { console.log(j); process.exit(j.ok ? 0 : 1) })"
+          docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/').then(r => { console.log('front', r.status); process.exit(r.ok ? 0 : 1) })"
+          docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/brochures/plazas-usa.pdf').then(r => { console.log('brochure', r.status); process.exit(r.ok ? 0 : 1) })"
+        env:
+          POSTGRES_PASSWORD: ci-test
+      - if: failure()
+        run: docker compose -f app/docker-compose.yml logs
+        env:
+          POSTGRES_PASSWORD: ci-test
