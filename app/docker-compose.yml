@@ -44,7 +44,7 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
     volumes: [backups:/backups]
     depends_on:
-      db:
+      app: # la app migra al arrancar: sin esto el primer dump sale sin tablas
         condition: service_healthy
     entrypoint: ["/bin/sh", "-c"]
     command:
