@@ -328,7 +328,8 @@
   {
    "key": "PJW-016",
    "title": "Vista previa de un texto corregido antes de guardarlo",
-   "status": "in_progress",
+   "status": "done",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-016-preview-textos",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
@@ -347,7 +348,9 @@
   {
    "key": "PJW-017",
    "title": "Interruptor por sección y publicar una presentación",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-017-publicar",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p0",
    "description": "En cada presentación, todas las secciones con un interruptor on/off y flechas para ordenar las prendidas (una nueva arranca con todas prendidas). Botón Publicar: una sola publicada a la vez (por defecto la Web completa) y / del VPS la muestra. La lista del presentador pasa a /presentar.",
