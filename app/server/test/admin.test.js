@@ -83,11 +83,32 @@ test('vista previa de un texto: solo su sección, con lo escrito y en su idioma,
   const cat = (await as.editor({ url: '/api/catalog' })).json()
   const sec = cat.sections.find(s => s.texts.length)
   const other = cat.sections.find(s => s !== sec)
+  const saved = () => as.editor({ url: '/api/texts' }).then(r => r.json().filter(o => o.element_id === sec.texts[0].id))
+  const before = await saved()
   const r = await as.editor({ method: 'POST', url: `/api/texts/${encodeURIComponent(sec.texts[0].id)}/en/preview`, payload: { text: 'Draft preview text' } })
   expect(r.statusCode).toBe(200)
   expect(r.body).toContain('Draft preview text')
   expect(r.body).toContain(`id="${sec.id}"`)
   expect(r.body).not.toContain(`id="${other.id}"`)
   expect(r.body).toMatch(/<html[^>]*lang="en"/)
-  expect((await as.editor({ url: '/api/texts' })).json()).toEqual([])
+  expect(await saved()).toEqual(before)
+})
+
+test('publicar: / muestra la publicada, una sola a la vez; el editor publica pero no arma; borrada vuelve a la Web completa', async () => {
+  const cat = (await as.admin({ url: '/api/catalog' })).json()
+  const [a, b] = cat.sections.slice(-2).map(s => s.id)
+  const list = () => as.admin({ url: '/api/presentations' }).then(r => r.json())
+  expect((await list()).filter(p => p.published).map(p => p.is_fixed)).toEqual([true]) // arranca la Web completa
+
+  const { id } = (await as.presenter({ method: 'POST', url: '/api/presentations', payload: { name: 'Publicable', sections: [a] } })).json()
+  expect((await as.editor({ method: 'PUT', url: `/api/presentations/${id}`, payload: { name: 'X', sections: [b] } })).statusCode).toBe(403)
+  expect((await as.editor({ method: 'POST', url: `/api/presentations/${id}/publish` })).statusCode).toBe(200)
+  expect((await list()).filter(p => p.published).map(p => p.id)).toEqual([id])
+  const home = (await as.editor({ url: '/' })).body
+  expect(home).toContain(`id="${a}"`)
+  expect(home).not.toContain(`id="${b}"`)
+
+  await as.presenter({ method: 'DELETE', url: `/api/presentations/${id}` })
+  expect((await as.editor({ url: '/' })).body).toContain(`id="${b}"`) // Web completa
+  expect((await as.editor({ method: 'POST', url: '/api/presentations/999999/publish' })).statusCode).toBe(404)
 })
