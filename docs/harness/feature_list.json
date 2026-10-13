@@ -162,7 +162,9 @@
   {
    "key": "PJW-008",
    "title": "Admin: armar presentaciones",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-008-admin",
+ "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-28",
@@ -182,7 +184,9 @@
   {
    "key": "PJW-009",
    "title": "Admin: editor de textos globales",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-008-admin",
+ "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "next",
    "priority": "p1",
    "target_date": "2026-10-28",
