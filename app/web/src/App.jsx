@@ -267,12 +267,20 @@ function TextField ({ t, lang, value, reload }) {
   useEffect(() => setDraft(current), [current])
   const url = `/api/texts/${encodeURIComponent(t.id)}/${lang}`
   const run = req => req.then(json).then(() => { setErr(''); return reload() }).catch(e => setErr(e.message))
+  async function preview () {
+    const w = window.open('', '_blank') // antes del fetch: si no, el navegador bloquea la pestaña
+    const r = await api(url + '/preview', { method: 'POST', body: { text: draft } })
+    if (!r.ok) { w.close(); return setErr((await r.json()).error) }
+    w.document.write(await r.text())
+    w.document.close()
+  }
   return (
     <div className={'tf' + (value != null ? ' changed' : '')}>
       <span className='lang'>{lang.toUpperCase()}</span>
       <textarea rows={Math.min(6, Math.ceil(draft.length / 90) || 1)} value={draft} onChange={e => setDraft(e.target.value)} />
       <div className='row'>
         {draft !== current && <button className='btn' onClick={() => run(api(url, { method: 'PUT', body: { text: draft } }))}>Guardar</button>}
+        <button className='btn alt' onClick={preview}>Ver</button>
         {value != null && <button className='btn alt' onClick={() => run(api(url, { method: 'DELETE' }))}>Volver al original</button>}
         {value != null && <span className='muted' title={t[lang]}>Corregido</span>}
         <span className='err'>{err}</span>

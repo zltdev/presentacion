@@ -78,3 +78,16 @@ test('el editor corrige un texto: se ve en todas las presentaciones, index.html 
   await as.editor({ method: 'DELETE', url: `/api/texts/${tid}/es` })
   expect((await as.editor({ url: `/p/${web.id}` })).body).not.toContain('Texto corregido por Conra')
 })
+
+test('vista previa de un texto: solo su sección, con lo escrito y en su idioma, sin guardar', async () => {
+  const cat = (await as.editor({ url: '/api/catalog' })).json()
+  const sec = cat.sections.find(s => s.texts.length)
+  const other = cat.sections.find(s => s !== sec)
+  const r = await as.editor({ method: 'POST', url: `/api/texts/${encodeURIComponent(sec.texts[0].id)}/en/preview`, payload: { text: 'Draft preview text' } })
+  expect(r.statusCode).toBe(200)
+  expect(r.body).toContain('Draft preview text')
+  expect(r.body).toContain(`id="${sec.id}"`)
+  expect(r.body).not.toContain(`id="${other.id}"`)
+  expect(r.body).toMatch(/<html[^>]*lang="en"/)
+  expect((await as.editor({ url: '/api/texts' })).json()).toEqual([])
+})
