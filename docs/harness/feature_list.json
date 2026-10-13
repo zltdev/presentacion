@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-018",
+  "next_key": "PJW-019",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -364,6 +364,26 @@
     "Publicar una presentación hace que / la muestre; solo una publicada a la vez",
     "Si se borra la publicada, / vuelve a la Web completa",
     "El editor puede publicar pero no editar presentaciones"
+   ],
+   "epic": "H-016"
+  },
+  {
+   "key": "PJW-018",
+   "title": "Miniatura de cada sección en el armado de presentaciones",
+   "status": "in_progress",
+   "branch": "PJW-018-miniaturas-secciones",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
+   "horizon": "now",
+   "priority": "p1",
+   "description": "En la lista de secciones de cada presentación, una miniatura de la sección tal como se ve en la web (con textos corregidos y en el idioma de la presentación), al lado del interruptor. Click abre la sección en grande.",
+   "notes": "Pedido de Facu (2026-10-13). Las miniaturas se renderizan de a una en el server (cada render parsea el index.html entero) y quedan en cache.",
+   "depends_on": [
+    "PJW-017"
+   ],
+   "acceptance": [
+    "Cada sección, prendida o apagada, muestra su miniatura",
+    "Abrir el armado no hace caer la app por memoria",
+    "Click en la miniatura abre la sección en grande"
    ],
    "epic": "H-016"
   }
