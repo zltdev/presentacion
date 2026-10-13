@@ -162,14 +162,15 @@
   {
    "key": "PJW-008",
    "title": "Admin: armar presentaciones",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-008-admin",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p0",
    "target_date": "2026-10-28",
    "description": "En /admin: listar, crear, duplicar, renombrar y borrar presentaciones (compartidas entre todos). Elegir y ordenar secciones, ocultar elementos con miniaturas, elegir idioma, vista previa. Presentación fija 'Web completa' (todas las secciones, no se puede borrar ni editar) que reemplaza a la web original tras el lanzamiento.",
-   "notes": "Web app de presentaciones (T7). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "PR #8 en producción (2026-10-13), falta que Facu lo pruebe (y en tablet). El presentador también corrige textos. Web app de presentaciones (T7). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
    "depends_on": [
     "PJW-007"
    ],
@@ -184,14 +185,15 @@
   {
    "key": "PJW-009",
    "title": "Admin: editor de textos globales",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-008-admin",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "next",
    "priority": "p1",
    "target_date": "2026-10-28",
    "description": "Pantalla para que el editor (Conra) y el admin corrijan textos por elemento e idioma. Guarda el override con el hash del texto original; nunca modifica index.html. Permite volver al original.",
-   "notes": "Web app de presentaciones (T8). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "PR #8 en producción (2026-10-13), falta que Facu lo pruebe (y en tablet). El presentador también corrige textos. Web app de presentaciones (T8). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
    "depends_on": [
     "PJW-007"
    ],
