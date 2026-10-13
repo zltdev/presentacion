@@ -112,3 +112,15 @@ test('publicar: / muestra la publicada, una sola a la vez; el editor publica per
   expect((await as.editor({ url: '/' })).body).toContain(`id="${b}"`) // Web completa
   expect((await as.editor({ method: 'POST', url: '/api/presentations/999999/publish' })).statusCode).toBe(404)
 })
+
+test('miniatura de sección: solo esa sección, en su idioma; ?thumb esconde el menú; inexistente da 404', async () => {
+  const [s, other] = (await as.editor({ url: '/api/catalog' })).json().sections
+  const r = await as.editor({ url: `/api/sections/${s.id}/preview?lang=en` })
+  expect(r.statusCode).toBe(200)
+  expect(r.body).toContain(`id="${s.id}"`)
+  expect(r.body).not.toContain(`id="${other.id}"`)
+  expect(r.body).toMatch(/<html[^>]*lang="en"/)
+  expect(r.body).not.toContain('#hdr{display:none')
+  expect((await as.editor({ url: `/api/sections/${s.id}/preview?thumb` })).body).toContain('#hdr{display:none')
+  expect((await as.editor({ url: '/api/sections/nada/preview' })).statusCode).toBe(404)
+})

@@ -81,6 +81,11 @@ button { font: inherit; cursor: pointer }
 .switch input:checked + span { background: var(--accent) }
 .switch input:checked + span::after { transform: translateX(16px) }
 .switch input:focus-visible + span { outline: 2px solid var(--tx); outline-offset: 2px }
+/* Miniatura: la sección a 1280x720 achicada */
+.thumb { position: relative; flex: none; width: 160px; height: 90px; overflow: hidden; border-radius: 3px; background: #111; margin-right: 6px }
+.thumb iframe { width: 1280px; height: 720px; border: 0; transform: scale(.125); transform-origin: 0 0; pointer-events: none }
+.secs li.off .thumb { opacity: .45; filter: grayscale(1) }
+.thumb:hover { outline: 2px solid var(--accent) }
 .pub { font-style: normal; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #8fd19e; border: 1px solid #4f8a5c; border-radius: 3px; padding: 2px 6px; margin-left: 8px }
 
 .texts .search { width: 100%; margin: 12px 0 4px }
