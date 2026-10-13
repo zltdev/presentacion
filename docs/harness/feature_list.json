@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-016",
+  "next_key": "PJW-018",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -322,6 +322,42 @@
     "beta-proyectos.somoszlt.com redirige a proyectos.somoszlt.com",
     "Un export nuevo de index.html en main sigue llegando a la app (PJW-011) sin pasar por Pages",
     "CLAUDE.md actualizado y PJW-001 cerrada o vinculada"
+   ],
+   "epic": "H-016"
+  },
+  {
+   "key": "PJW-016",
+   "title": "Vista previa de un texto corregido antes de guardarlo",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p1",
+   "description": "En Administrar > Textos, cada campo tiene 'Ver': abre en otra pestaña la sección de ese texto con lo escrito (aunque no esté guardado), en el idioma del campo.",
+   "notes": "Pedido de Facu (2026-10-13): ver cómo queda el cambio de texto.",
+   "depends_on": [
+    "PJW-009"
+   ],
+   "acceptance": [
+    "'Ver' muestra la sección con el texto sin guardar y en el idioma del campo",
+    "Nada se guarda al previsualizar"
+   ],
+   "epic": "H-016"
+  },
+  {
+   "key": "PJW-017",
+   "title": "Interruptor por sección y publicar una presentación",
+   "status": "pending",
+   "horizon": "now",
+   "priority": "p0",
+   "description": "En cada presentación, todas las secciones con un interruptor on/off y flechas para ordenar las prendidas (una nueva arranca con todas prendidas). Botón Publicar: una sola publicada a la vez (por defecto la Web completa) y / del VPS la muestra. La lista del presentador pasa a /presentar.",
+   "notes": "Pedido de Facu (2026-10-13): publicar en / del VPS; proyectos.somoszlt.com sigue en Pages hasta PJW-015. Spec: 'Publicación (cambio del 2026-10-09)'.",
+   "depends_on": [
+    "PJW-008"
+   ],
+   "acceptance": [
+    "Apagar una sección la saca de la presentación y prenderla la vuelve a poner",
+    "Publicar una presentación hace que / la muestre; solo una publicada a la vez",
+    "Si se borra la publicada, / vuelve a la Web completa",
+    "El editor puede publicar pero no editar presentaciones"
    ],
    "epic": "H-016"
   }
