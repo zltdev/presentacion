@@ -370,13 +370,14 @@
   {
    "key": "PJW-018",
    "title": "Miniatura de cada sección en el armado de presentaciones",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-018-miniaturas-secciones",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p1",
    "description": "En la lista de secciones de cada presentación, una miniatura de la sección tal como se ve en la web (con textos corregidos y en el idioma de la presentación), al lado del interruptor. Click abre la sección en grande.",
-   "notes": "Pedido de Facu (2026-10-13). Las miniaturas se renderizan de a una en el server (cada render parsea el index.html entero) y quedan en cache.",
+   "notes": "PR #12 en producción (2026-10-13), falta que Facu lo pruebe. Pedido de Facu (2026-10-13). Las miniaturas se renderizan de a una en el server (cada render parsea el index.html entero) y quedan en cache.",
    "depends_on": [
     "PJW-017"
    ],
