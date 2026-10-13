@@ -328,7 +328,9 @@
   {
    "key": "PJW-016",
    "title": "Vista previa de un texto corregido antes de guardarlo",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-016-preview-textos",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p1",
    "description": "En Administrar > Textos, cada campo tiene 'Ver': abre en otra pestaña la sección de ese texto con lo escrito (aunque no esté guardado), en el idioma del campo.",
