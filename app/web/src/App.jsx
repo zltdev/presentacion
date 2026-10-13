@@ -217,12 +217,18 @@ function Sections ({ catalog, p, set }) {
               <span />
             </label>
           )
-          if (!on) return <li key={s.id} className='off'><div className='head'>{sw}<span className='t'>{s.title}</span></div></li>
+          const thumb = (
+            <a className='thumb' href={`/api/sections/${s.id}/preview?lang=${p.lang}`} target='_blank' rel='noreferrer' title='Ver la sección en grande' onClick={e => e.stopPropagation()}>
+              <iframe src={`/api/sections/${s.id}/preview?lang=${p.lang}&thumb`} loading='lazy' tabIndex={-1} title={s.title} />
+            </a>
+          )
+          if (!on) return <li key={s.id} className='off'><div className='head'>{sw}{thumb}<span className='t'>{s.title}</span></div></li>
           return (
             <li key={s.id}>
               <details>
                 <summary>
                   {sw}
+                  {thumb}
                   <span className='t'>{s.title}</span>
                   <button title='Subir' disabled={!i} onClick={btn(() => move(i, -1))}>↑</button>
                   <button title='Bajar' disabled={i === chosen.length - 1} onClick={btn(() => move(i, 1))}>↓</button>

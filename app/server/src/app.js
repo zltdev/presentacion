@@ -161,6 +161,32 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
     return reply.type('text/html; charset=utf-8').header('cache-control', 'private, no-store').send(html)
   })
 
+  // Una sección sola con los textos corregidos (PJW-018). Con ?thumb, sin menú ni scroll: la miniatura.
+  // ponytail: de a un render por vez (cada uno parsea el index.html entero, ~200 MB) y en cache
+  // hasta que cambie un texto: ~40 MB para las 27 secciones en los dos idiomas.
+  const thumbCache = new Map()
+  let thumbVersion = ''
+  let thumbQueue = Promise.resolve()
+  app.get('/api/sections/:id/preview', async (req, reply) => {
+    const { id } = req.params
+    const lang = req.query.lang === 'en' ? 'en' : 'es'
+    if (!getCatalog().sections.some(s => s.id === id)) return reply.code(404).send({ error: 'Sección inexistente.' })
+    const { rows: ov } = await db.query('SELECT element_id, lang, text, updated_at FROM text_overrides')
+    const version = ov.map(o => o.element_id + o.lang + +o.updated_at).join('|')
+    if (version !== thumbVersion) { thumbCache.clear(); thumbVersion = version }
+    const key = id + ':' + lang
+    if (!thumbCache.has(key)) {
+      const overrides = {}
+      for (const o of ov) (overrides[o.element_id] ??= {})[o.lang] = o.text
+      const job = thumbQueue.then(() => thumbCache.get(key) ?? renderPresentation(baseHtml, { sections: [id], hidden: [], lang, overrides }))
+      thumbQueue = job.catch(() => {})
+      thumbCache.set(key, await job)
+    }
+    const html = thumbCache.get(key)
+    return reply.type('text/html; charset=utf-8').header('cache-control', 'private, max-age=300')
+      .send('thumb' in req.query ? html.replace('</head>', '<style>#hdr{display:none!important}html{overflow:hidden}</style></head>') : html)
+  })
+
   // Presentación renderizada. Sin sesión, al login (que vuelve acá después).
   // ponytail: cache en memoria por versión de presentación + textos; se invalida sola al cambiar algo
   const cache = new Map()
