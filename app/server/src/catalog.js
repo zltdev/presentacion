@@ -26,6 +26,16 @@ function stableIds (sid, type, items, key) {
   })
 }
 
+// index.html trae las imágenes en base64 (27 MB): cheerio con eso adentro pasa 1 GB de heap.
+// Se carga con marcadores cortos y $.restore repone los originales (IDs y HTML final iguales).
+const DATA_URI = /data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+/g
+export function loadHtml (html) {
+  const uris = []
+  const $ = cheerio.load(html.replace(DATA_URI, u => `zltdata:${uris.push(u) - 1}`))
+  $.restore = s => s?.replace(/zltdata:(\d+)/g, (_, i) => uris[i])
+  return $
+}
+
 const BLOCK_KEY = {
   video: ($, el) => $(el).find('a').attr('href') || $(el).html(),
   foto: ($, el) => $(el).find('img').attr('src') || $(el).html(),
@@ -41,7 +51,7 @@ export function indexDocument ($) {
     const elements = []
     for (const [type, sel] of Object.entries(BLOCKS)) {
       const key = BLOCK_KEY[type] || BLOCK_KEY.default
-      elements.push(...stableIds(sid, type, $(sec).find(sel).toArray(), el => key($, el)).map(e => ({ ...e, type })))
+      elements.push(...stableIds(sid, type, $(sec).find(sel).toArray(), el => $.restore(key($, el))).map(e => ({ ...e, type })))
     }
     // Textos editables (PJW-009): cada par español/inglés
     const pairs = $(sec).find('.l-es').toArray().filter(el => $(el).next('.l-en').length)
@@ -59,7 +69,7 @@ function sectionTitle ($, sec) {
 
 // Catálogo serializable para el admin: secciones, elementos ocultables y textos.
 export function buildCatalog (html) {
-  const $ = cheerio.load(html)
+  const $ = loadHtml(html)
   const sections = indexDocument($).map(s => {
     const counts = {}
     return {
@@ -71,7 +81,7 @@ export function buildCatalog (html) {
         const label = type === 'video'
           ? $(el).find('a').attr('href')
           : type === 'brochure' ? $(el).attr('href') : `${type} ${counts[type]}`
-        return { id, type, label, ...(type === 'foto' && { src: $(el).find('img').attr('src') }) }
+        return { id, type, label, ...(type === 'foto' && { src: $.restore($(el).find('img').attr('src')) }) }
       }),
       texts: s.texts.map(({ id, el }) => ({ id, es: $(el).text(), en: $(el).next('.l-en').text() }))
     }
