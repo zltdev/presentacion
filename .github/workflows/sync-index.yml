@@ -1,0 +1,28 @@
+# PJW-011: la app del VPS se construye desde zltdev/webapp (Dokploy), pero index.html lo suben
+# a main. Este workflow copia index.html de main a zltdev/webapp; ese push dispara el deploy.
+name: sync-index
+on:
+  push:
+    branches: [main]
+    paths: [index.html]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: sync-index
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: zltdev/webapp
+          fetch-depth: 0
+      - name: Copiar index.html de main
+        run: |
+          git fetch origin main
+          git checkout origin/main -- index.html
+          if git diff --cached --quiet; then echo "index.html ya está igual"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "sync: index.html de main ($(git rev-parse --short origin/main))"
+          git push origin HEAD:zltdev/webapp

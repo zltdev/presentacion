@@ -225,7 +225,9 @@
   {
    "key": "PJW-011",
    "title": "Sync de index.html desde main y aviso de cambios",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-011-sync",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "next",
    "priority": "p1",
    "target_date": "2026-10-30",
