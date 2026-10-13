@@ -124,6 +124,39 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
     return reply.type(m[1]).header('cache-control', 'private, max-age=86400').send(Buffer.from(m[2], 'base64'))
   })
 
+  // Avisos de cambios (PJW-011): lo guardado que ya no existe en el index.html actual.
+  // Los IDs llevan el hash del contenido, así que un texto o foto que cambió en la web base
+  // deja de existir con su ID viejo y aparece acá.
+  app.get('/api/changes', async () => {
+    const cat = getCatalog()
+    const sections = new Set(cat.sections.map(s => s.id))
+    const elements = new Set(cat.sections.flatMap(s => s.elements.map(e => e.id)))
+    const texts = new Set(cat.sections.flatMap(s => s.texts.map(t => t.id)))
+    const { rows: ov } = await db.query('SELECT element_id, lang, text FROM text_overrides ORDER BY element_id, lang')
+    const { rows: pres } = await db.query('SELECT id, name, sections, hidden FROM presentations WHERE NOT is_fixed ORDER BY name')
+    return {
+      texts: ov.filter(o => !texts.has(o.element_id)),
+      presentations: pres.map(p => ({
+        id: p.id,
+        name: p.name,
+        sections: p.sections.filter(id => !sections.has(id)),
+        hidden: p.hidden.filter(id => !elements.has(id) && sections.has(id.split(':')[0]))
+      })).filter(p => p.sections.length || p.hidden.length)
+    }
+  })
+
+  // Sacar de una presentación lo que ya no existe
+  app.post('/api/presentations/:id/clean', { preHandler: builder }, async (req, reply) => {
+    const cat = getCatalog()
+    const sections = new Set(cat.sections.map(s => s.id))
+    const elements = new Set(cat.sections.flatMap(s => s.elements.map(e => e.id)))
+    const { rows: [p] } = await db.query('SELECT sections, hidden FROM presentations WHERE id = $1 AND NOT is_fixed', [Number(req.params.id) || 0])
+    if (!p) return reply.code(404).send({ error: 'Presentación inexistente.' })
+    await db.query('UPDATE presentations SET sections = $2, hidden = $3, updated_at = now() WHERE id = $1',
+      [req.params.id, JSON.stringify(p.sections.filter(id => sections.has(id))), JSON.stringify(p.hidden.filter(id => elements.has(id)))])
+    return { ok: true }
+  })
+
   // Textos corregidos (PJW-009): globales, por elemento e idioma. Nunca tocan index.html.
   const textEditor = requireRole('admin', 'presenter', 'editor')
   app.get('/api/texts', async () =>
