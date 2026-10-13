@@ -146,6 +146,7 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
       for (const o of ov) (overrides[o.element_id] ??= {})[o.lang] = o.text
       for (const k of cache.keys()) if (k.startsWith(p.id + ':')) cache.delete(k)
       cache.set(key, renderPresentation(baseHtml, { ...p, overrides }))
+      if (cache.size > 4) cache.delete(cache.keys().next().value) // ~27 MB cada una; el contenedor tiene 1 GB
     }
     return reply.type('text/html; charset=utf-8').header('cache-control', 'private, no-store').send(cache.get(key))
   })

@@ -1,11 +1,10 @@
-import * as cheerio from 'cheerio'
-import { indexDocument } from './catalog.js'
+import { indexDocument, loadHtml } from './catalog.js'
 
 // Arma el HTML de una presentación a partir de index.html sin tocar el archivo base.
 // p = { sections: [ids en orden] (vacío = todas, "Web completa"), hidden: [ids de elementos],
 //       lang: 'es'|'en', overrides: { [textId]: { es?, en? } } }
 export function renderPresentation (html, p) {
-  const $ = cheerio.load(html)
+  const $ = loadHtml(html)
   const hidden = new Set(p.hidden || [])
   const index = indexDocument($)
 
@@ -42,7 +41,7 @@ export function renderPresentation (html, p) {
     $('body').addClass('en')
     $('html').attr('lang', 'en')
   }
-  return $.html()
+  return $.restore($.html())
 }
 
 // El JS de la web cuenta las fotos solo, pero el total "/ N" y los puntos vienen fijos en el HTML
