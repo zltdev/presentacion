@@ -348,13 +348,14 @@
   {
    "key": "PJW-017",
    "title": "Interruptor por sección y publicar una presentación",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-017-publicar",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p0",
    "description": "En cada presentación, todas las secciones con un interruptor on/off y flechas para ordenar las prendidas (una nueva arranca con todas prendidas). Botón Publicar: una sola publicada a la vez (por defecto la Web completa) y / del VPS la muestra. La lista del presentador pasa a /presentar.",
-   "notes": "Pedido de Facu (2026-10-13): publicar en / del VPS; proyectos.somoszlt.com sigue en Pages hasta PJW-015. Spec: 'Publicación (cambio del 2026-10-09)'.",
+   "notes": "PR #11 en producción (2026-10-13), falta que Facu lo pruebe. Pedido de Facu (2026-10-13): publicar en / del VPS; proyectos.somoszlt.com sigue en Pages hasta PJW-015. Spec: 'Publicación (cambio del 2026-10-09)'.",
    "depends_on": [
     "PJW-008"
    ],
