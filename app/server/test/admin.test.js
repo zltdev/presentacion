@@ -124,3 +124,26 @@ test('miniatura de sección: solo esa sección, en su idioma; ?thumb esconde el 
   expect((await as.editor({ url: `/api/sections/${s.id}/preview?thumb` })).body).toContain('#hdr{display:none')
   expect((await as.editor({ url: '/api/sections/nada/preview' })).statusCode).toBe(404)
 })
+
+test('avisos de cambios: lo guardado que ya no existe en index.html aparece y se puede limpiar', async () => {
+  const cat = (await as.admin({ url: '/api/catalog' })).json()
+  const sec = cat.sections.find(s => s.elements.length)
+  const { id } = (await as.presenter({
+    method: 'POST',
+    url: '/api/presentations',
+    payload: { name: 'Con huérfanos', sections: [sec.id, 'seccion-borrada'], hidden: [sec.elements[0].id, `${sec.id}:foto:00000bad`] }
+  })).json()
+  await db.query("INSERT INTO text_overrides (element_id, lang, text, original_hash) VALUES ('hero:txt:viejo', 'es', 'Texto viejo', 'x') ON CONFLICT DO NOTHING")
+
+  const ch = (await as.editor({ url: '/api/changes' })).json()
+  expect(ch.texts).toContainEqual(expect.objectContaining({ element_id: 'hero:txt:viejo', text: 'Texto viejo' }))
+  const mine = ch.presentations.find(p => p.id === id)
+  expect(mine).toMatchObject({ sections: ['seccion-borrada'], hidden: [`${sec.id}:foto:00000bad`] })
+
+  expect((await as.editor({ method: 'POST', url: `/api/presentations/${id}/clean` })).statusCode).toBe(403)
+  expect((await as.presenter({ method: 'POST', url: `/api/presentations/${id}/clean` })).statusCode).toBe(200)
+  expect((await as.presenter({ url: `/api/presentations/${id}` })).json()).toMatchObject({ sections: [sec.id], hidden: [sec.elements[0].id] })
+  expect((await as.editor({ url: '/api/changes' })).json().presentations.find(p => p.id === id)).toBeUndefined()
+  await as.editor({ method: 'DELETE', url: '/api/texts/hero%3Atxt%3Aviejo/es' })
+  await as.presenter({ method: 'DELETE', url: `/api/presentations/${id}` })
+})

@@ -99,12 +99,40 @@ function Admin ({ user }) {
   return (
     <main className='page'>
       <h1>Administrar</h1>
+      <Changes builder={builder} catalog={catalog} />
       <div className='tabs'>
         <button className={tab === 'pres' ? 'on' : ''} onClick={() => setTab('pres')}>Presentaciones</button>
         <button className={tab === 'txt' ? 'on' : ''} onClick={() => setTab('txt')}>Textos</button>
       </div>
       {!catalog ? <p className='muted'>Cargando…</p> : tab === 'pres' ? <Builder catalog={catalog} builder={builder} /> : <Texts catalog={catalog} />}
     </main>
+  )
+}
+
+// Avisos (PJW-011): correcciones y presentaciones que apuntan a algo que cambió en la web base
+function Changes ({ builder, catalog }) {
+  const [ch, setCh] = useState(null)
+  const load = () => api('/api/changes').then(json).then(setCh).catch(() => {})
+  useEffect(() => { load() }, [catalog])
+  if (!ch || (!ch.texts.length && !ch.presentations.length)) return null
+  const title = id => catalog?.sections.find(s => s.id === id.split(':')[0])?.title || id.split(':')[0]
+  const act = req => req.then(json).then(load)
+  return (
+    <aside className='warn' role='status'>
+      <strong>La web base cambió y esto ya no coincide</strong>
+      {ch.texts.map(t => (
+        <p key={t.element_id + t.lang}>
+          <span>Corrección ({t.lang.toUpperCase()}) en «{title(t.element_id)}»: <em>{t.text.slice(0, 120)}</em> — el texto original cambió o ya no está. Volvé a corregirlo en Textos si hace falta.</span>
+          <button className='btn alt' onClick={() => act(api(`/api/texts/${encodeURIComponent(t.element_id)}/${t.lang}`, { method: 'DELETE' }))}>Descartar</button>
+        </p>
+      ))}
+      {ch.presentations.map(p => (
+        <p key={p.id}>
+          <span>«{p.name}»: {p.sections.length ? `${p.sections.length} sección(es) ya no existen` : ''}{p.sections.length && p.hidden.length ? ' y ' : ''}{p.hidden.length ? `${p.hidden.length} elemento(s) ocultos ya no existen` : ''}.</span>
+          {builder && <button className='btn alt' onClick={() => act(api(`/api/presentations/${p.id}/clean`, { method: 'POST' }))}>Limpiar</button>}
+        </p>
+      ))}
+    </aside>
   )
 }
 
