@@ -71,7 +71,7 @@ export function buildCatalog (html) {
         const label = type === 'video'
           ? $(el).find('a').attr('href')
           : type === 'brochure' ? $(el).attr('href') : `${type} ${counts[type]}`
-        return { id, type, label }
+        return { id, type, label, ...(type === 'foto' && { src: $(el).find('img').attr('src') }) }
       }),
       texts: s.texts.map(({ id, el }) => ({ id, es: $(el).text(), en: $(el).next('.l-en').text() }))
     }
