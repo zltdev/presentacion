@@ -131,6 +131,20 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
     return { ok: true }
   })
 
+  // Vista previa (PJW-016): la sección del texto con lo escrito, sin guardar nada
+  app.post('/api/texts/:id/:lang/preview', { preHandler: textEditor }, async (req, reply) => {
+    const { id, lang } = req.params
+    const section = getCatalog().sections.find(s => s.texts.some(t => t.id === id))
+    const text = req.body?.text
+    if (!section || !['es', 'en'].includes(lang)) return reply.code(404).send({ error: 'Texto inexistente.' })
+    if (typeof text !== 'string') return reply.code(400).send({ error: 'Falta el texto.' })
+    const overrides = {}
+    for (const o of (await db.query('SELECT element_id, lang, text FROM text_overrides')).rows) (overrides[o.element_id] ??= {})[o.lang] = o.text
+    overrides[id] = { ...overrides[id], [lang]: text }
+    const html = renderPresentation(baseHtml, { sections: [section.id], hidden: [], lang, overrides })
+    return reply.type('text/html; charset=utf-8').header('cache-control', 'private, no-store').send(html)
+  })
+
   // Presentación renderizada. Sin sesión, al login (que vuelve acá después).
   // ponytail: cache en memoria por versión de presentación + textos; se invalida sola al cambiar algo
   const cache = new Map()
