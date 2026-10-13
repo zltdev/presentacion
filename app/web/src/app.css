@@ -40,4 +40,51 @@ button { font: inherit; cursor: pointer }
 .grid strong { display: block; font-size: 16px; margin-bottom: 6px }
 .grid span { color: var(--muted); font-size: 13px }
 
+/* Administrar */
+.tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #3a3a3e }
+.tabs button { background: none; border: 0; color: var(--muted); padding: 8px 4px; margin-right: 18px; border-bottom: 2px solid transparent; font-size: 14px }
+.tabs button.on { color: var(--tx); border-color: var(--accent) }
+.btn { display: inline-block; height: 36px; line-height: 36px; padding: 0 16px; border: 0; border-radius: 3px; background: var(--btn); color: #fff; font-size: 13px; text-decoration: none }
+.btn:hover { background: #6c8194 }
+.btn.alt { background: transparent; border: 1px solid var(--btn); line-height: 34px }
+.btn.danger { background: transparent; border: 1px solid #a5513f; color: #e06c5a; line-height: 34px }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 14px }
+.page input, .page select, .page textarea { font: inherit; font-size: 14px; background: var(--input); color: #1b1b1d; border: 0; border-radius: 3px; padding: 8px 10px }
+.page input:disabled, .page select:disabled { opacity: .6 }
+.page h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 22px 0 10px }
+.pad { padding: 0 12px 12px }
+
+.builder { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: start }
+.builder aside ul { list-style: none; padding: 0; margin-top: 12px }
+.builder aside li button { width: 100%; text-align: left; background: none; border: 0; border-left: 2px solid transparent; color: var(--tx); padding: 9px 10px; font-size: 14px }
+.builder aside li button.on { background: var(--card); border-color: var(--accent) }
+.editor .row input { flex: 1; min-width: 200px }
+.secs { list-style: none; padding: 0 }
+.secs li { background: var(--card); margin-bottom: 6px }
+.secs summary { display: flex; align-items: center; gap: 6px; padding: 8px 12px; cursor: pointer }
+.secs summary .t { flex: 1 }
+.secs summary button { width: 36px; height: 36px; background: #2a2a2e; border: 0; color: var(--tx); border-radius: 3px }
+.secs summary button:disabled { opacity: .3; cursor: default }
+.els { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 12px 12px }
+.els label { display: flex; align-items: center; gap: 6px; background: #2a2a2e; padding: 6px 8px; border-radius: 3px; font-size: 12px; max-width: 100%; cursor: pointer }
+.els label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px }
+.els img { height: 64px; border-radius: 2px }
+.els label.off { opacity: .4 }
+.els label.off img { filter: grayscale(1) }
+.add { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 6px }
+.add button { background: none; border: 1px dashed #55555b; color: var(--tx); padding: 9px 12px; border-radius: 3px; font-size: 13px }
+
+.texts .search { width: 100%; margin: 12px 0 4px }
+.texts details { background: var(--card); margin-bottom: 6px }
+.texts summary { padding: 12px; cursor: pointer }
+.texts details[open] { padding-bottom: 6px }
+.texts details .tf { padding: 0 12px }
+.tf { display: grid; grid-template-columns: 34px 1fr; gap: 4px 8px; margin-bottom: 10px }
+.tf .lang { font-size: 11px; color: var(--muted); padding-top: 10px }
+.tf textarea { width: 100%; resize: vertical }
+.tf.changed textarea { outline: 2px solid var(--accent) }
+.tf .row { grid-column: 2; margin: 0 }
+.tf .err { color: #e06c5a; font-size: 13px }
+
+@media (max-width: 760px) { .builder { grid-template-columns: 1fr } }
 @media (max-width: 520px) { .top { flex-wrap: wrap; gap: 12px } .who { display: none } }
