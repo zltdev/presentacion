@@ -4,7 +4,8 @@ import './app.css'
 
 const api = (url, opts = {}) => fetch(url, {
   ...opts,
-  headers: { 'content-type': 'application/json', ...opts.headers },
+  // sin body no va content-type: Fastify rechaza un JSON vacío (rompía Salir, Borrar, Publicar)
+  headers: opts.body ? { 'content-type': 'application/json', ...opts.headers } : opts.headers,
   body: opts.body && JSON.stringify(opts.body)
 })
 
@@ -24,8 +25,9 @@ export default function App () {
       <header className='top'>
         <img src='/logo.webp' alt='ZLT' />
         <nav>
-          {user.role !== 'editor' && <a href='/' className={admin ? '' : 'on'}>Presentar</a>}
+          {user.role !== 'editor' && <a href='/presentar' className={admin ? '' : 'on'}>Presentar</a>}
           <a href='/admin' className={admin ? 'on' : ''}>Administrar</a>
+          <a href='/'>Publicada</a>
         </nav>
         <span className='who'>{user.name}</span>
         <button className='link' onClick={() => api('/api/logout', { method: 'POST' }).then(() => location.assign('/'))}>Salir</button>
@@ -90,7 +92,7 @@ function Presentations () {
 const json = r => r.json().then(d => { if (!r.ok) throw new Error(d.error || 'Error'); return d })
 
 function Admin ({ user }) {
-  const builder = user.role !== 'editor' // el editor solo corrige textos
+  const builder = user.role !== 'editor' // el editor corrige textos y publica, no arma
   const [tab, setTab] = useState(builder ? 'pres' : 'txt')
   const [catalog, setCatalog] = useState(null)
   useEffect(() => { api('/api/catalog').then(json).then(setCatalog) }, [])
@@ -98,15 +100,15 @@ function Admin ({ user }) {
     <main className='page'>
       <h1>Administrar</h1>
       <div className='tabs'>
-        {builder && <button className={tab === 'pres' ? 'on' : ''} onClick={() => setTab('pres')}>Presentaciones</button>}
+        <button className={tab === 'pres' ? 'on' : ''} onClick={() => setTab('pres')}>Presentaciones</button>
         <button className={tab === 'txt' ? 'on' : ''} onClick={() => setTab('txt')}>Textos</button>
       </div>
-      {!catalog ? <p className='muted'>Cargando…</p> : tab === 'pres' ? <Builder catalog={catalog} /> : <Texts catalog={catalog} />}
+      {!catalog ? <p className='muted'>Cargando…</p> : tab === 'pres' ? <Builder catalog={catalog} builder={builder} /> : <Texts catalog={catalog} />}
     </main>
   )
 }
 
-function Builder ({ catalog }) {
+function Builder ({ catalog, builder }) {
   const [list, setList] = useState([])
   const [p, setP] = useState(null) // presentación en edición
   const [msg, setMsg] = useState('')
@@ -114,7 +116,7 @@ function Builder ({ catalog }) {
   useEffect(() => { load() }, [])
 
   const open = id => api(`/api/presentations/${id}`).then(json).then(d => { setP(d); setMsg('') })
-  const fresh = () => { setP({ name: '', lang: 'es', sections: [], hidden: [] }); setMsg('') }
+  const fresh = () => { setP({ name: '', lang: 'es', sections: catalog.sections.map(s => s.id), hidden: [] }); setMsg('') }
   const set = patch => setP(x => ({ ...x, ...patch }))
   const fail = e => setMsg(e.message)
 
@@ -135,6 +137,15 @@ function Builder ({ catalog }) {
     name: `Copia de ${p.name}`,
     sections: p.is_fixed ? catalog.sections.map(s => s.id) : p.sections
   }).catch(fail)
+  async function publish () {
+    if (!confirm(`¿Publicar "${p.name}"? La página principal (/) va a mostrar esta presentación.`)) return
+    try {
+      await api(`/api/presentations/${p.id}/publish`, { method: 'POST' }).then(json)
+      await load()
+      await open(p.id)
+      setMsg('Publicada.')
+    } catch (e) { fail(e) }
+  }
   async function remove () {
     if (!confirm(`¿Borrar "${p.name}"?`)) return
     try {
@@ -147,32 +158,34 @@ function Builder ({ catalog }) {
   return (
     <div className='builder'>
       <aside>
-        <button className='btn' onClick={fresh}>+ Nueva</button>
+        {builder && <button className='btn' onClick={fresh}>+ Nueva</button>}
         <ul>
           {list.map(x => (
-            <li key={x.id}><button className={p?.id === x.id ? 'on' : ''} onClick={() => open(x.id)}>{x.name}</button></li>
+            <li key={x.id}><button className={p?.id === x.id ? 'on' : ''} onClick={() => open(x.id)}>{x.name}{x.published && <em className='pub'>Publicada</em>}</button></li>
           ))}
         </ul>
       </aside>
       {!p ? <p className='muted'>Elegí una presentación o creá una nueva.</p> : (
         <section className='editor'>
           <div className='row'>
-            <input aria-label='Nombre' placeholder='Nombre' value={p.name} disabled={p.is_fixed} onChange={e => set({ name: e.target.value })} />
-            <select aria-label='Idioma' value={p.lang} disabled={p.is_fixed} onChange={e => set({ lang: e.target.value })}>
+            <input aria-label='Nombre' placeholder='Nombre' value={p.name} disabled={p.is_fixed || !builder} onChange={e => set({ name: e.target.value })} />
+            <select aria-label='Idioma' value={p.lang} disabled={p.is_fixed || !builder} onChange={e => set({ lang: e.target.value })}>
               <option value='es'>Español</option>
               <option value='en'>English</option>
             </select>
           </div>
           <div className='row'>
-            {!p.is_fixed && <button className='btn' onClick={() => save().catch(fail)}>Guardar</button>}
+            {builder && !p.is_fixed && <button className='btn' onClick={() => save().catch(fail)}>Guardar</button>}
             {p.id && <a className='btn alt' href={`/p/${p.id}`} target='_blank' rel='noreferrer'>Vista previa</a>}
-            {p.id && <button className='btn alt' onClick={duplicate}>Duplicar</button>}
-            {p.id && !p.is_fixed && <button className='btn danger' onClick={remove}>Borrar</button>}
+            {p.id && !p.published && <button className='btn alt' onClick={publish}>Publicar</button>}
+            {p.published && <span className='pub'>Publicada</span>}
+            {builder && p.id && <button className='btn alt' onClick={duplicate}>Duplicar</button>}
+            {builder && p.id && !p.is_fixed && <button className='btn danger' onClick={remove}>Borrar</button>}
             <span className='muted'>{msg}</span>
           </div>
           {p.is_fixed
             ? <p className='muted'>La Web completa muestra todo index.html y no se puede cambiar. Duplicala para armar una a partir de ella.</p>
-            : <Sections catalog={catalog} p={p} set={set} />}
+            : builder && <Sections catalog={catalog} p={p} set={set} />}
         </section>
       )}
     </div>
@@ -194,18 +207,25 @@ function Sections ({ catalog, p, set }) {
 
   return (
     <>
-      <h2>En la presentación ({chosen.length})</h2>
+      <h2>Secciones ({chosen.length} de {catalog.sections.length} prendidas)</h2>
       <ol className='secs'>
-        {chosen.map((id, i) => {
-          const s = byId.get(id)
+        {[...chosen.map(id => byId.get(id)), ...rest].map((s, i) => {
+          const on = i < chosen.length
+          const sw = (
+            <label className='switch' title={on ? 'Apagar sección' : 'Prender sección'} onClick={e => e.stopPropagation()}>
+              <input type='checkbox' checked={on} onChange={() => set({ sections: on ? chosen.filter(x => x !== s.id) : [...chosen, s.id] })} />
+              <span />
+            </label>
+          )
+          if (!on) return <li key={s.id} className='off'><div className='head'>{sw}<span className='t'>{s.title}</span></div></li>
           return (
-            <li key={id}>
+            <li key={s.id}>
               <details>
                 <summary>
+                  {sw}
                   <span className='t'>{s.title}</span>
                   <button title='Subir' disabled={!i} onClick={btn(() => move(i, -1))}>↑</button>
                   <button title='Bajar' disabled={i === chosen.length - 1} onClick={btn(() => move(i, 1))}>↓</button>
-                  <button title='Quitar' onClick={btn(() => set({ sections: chosen.filter(x => x !== id) }))}>✕</button>
                 </summary>
                 {s.elements.length
                   ? (
@@ -224,10 +244,6 @@ function Sections ({ catalog, p, set }) {
           )
         })}
       </ol>
-      <h2>Agregar secciones</h2>
-      <ul className='add'>
-        {rest.map(s => <li key={s.id}><button onClick={() => set({ sections: [...chosen, s.id] })}>+ {s.title}</button></li>)}
-      </ul>
     </>
   )
 }

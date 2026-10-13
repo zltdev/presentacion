@@ -43,7 +43,7 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
   app.get('/api/me', async req => ({ user: req.user }))
 
   app.get('/api/presentations', async () =>
-    (await db.query('SELECT id, name, lang, is_fixed, updated_at FROM presentations ORDER BY is_fixed DESC, updated_at DESC')).rows)
+    (await db.query('SELECT id, name, lang, is_fixed, published, updated_at FROM presentations ORDER BY is_fixed DESC, updated_at DESC')).rows)
 
   // Validación de lo que manda el admin. Devuelve el error o los campos limpios.
   const strings = a => Array.isArray(a) && a.every(x => typeof x === 'string')
@@ -85,6 +85,22 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
   app.delete('/api/presentations/:id', { preHandler: [builder, editable] }, async req => {
     await db.query('DELETE FROM presentations WHERE id = $1', [req.params.id])
     return { ok: true }
+  })
+
+  // Publicar (PJW-017): / muestra la publicada. El editor también publica.
+  app.post('/api/presentations/:id/publish', { preHandler: requireRole('admin', 'presenter', 'editor') }, async (req, reply) => {
+    const client = await db.connect()
+    try {
+      await client.query('BEGIN')
+      await client.query('UPDATE presentations SET published = false WHERE published')
+      const r = await client.query('UPDATE presentations SET published = true WHERE id = $1', [Number(req.params.id) || 0])
+      if (!r.rowCount) { await client.query('ROLLBACK'); return reply.code(404).send({ error: 'Presentación inexistente.' }) }
+      await client.query('COMMIT')
+      return { ok: true }
+    } catch (err) {
+      await client.query('ROLLBACK')
+      throw err
+    } finally { client.release() }
   })
 
   // Catálogo de index.html para el admin. Las fotos van aparte (/api/thumb): son base64 pesados.
@@ -148,9 +164,8 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
   // Presentación renderizada. Sin sesión, al login (que vuelve acá después).
   // ponytail: cache en memoria por versión de presentación + textos; se invalida sola al cambiar algo
   const cache = new Map()
-  app.get('/p/:id', async (req, reply) => {
-    if (!req.user) return reply.redirect(`/?next=${encodeURIComponent(req.url)}`)
-    const { rows: [p] } = await db.query('SELECT id, lang, sections, hidden, updated_at FROM presentations WHERE id = $1', [Number(req.params.id) || 0])
+  const COLS = 'SELECT id, lang, sections, hidden, updated_at FROM presentations'
+  async function sendRendered (reply, p) {
     if (!p) return reply.code(404).send('Presentación inexistente')
     const { rows: ov } = await db.query('SELECT element_id, lang, text, updated_at FROM text_overrides')
     const key = `${p.id}:${+p.updated_at}:${ov.map(o => o.element_id + o.lang + +o.updated_at).join('|')}`
@@ -163,6 +178,15 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
       if (cache.size > 4) cache.delete(cache.keys().next().value) // ~27 MB cada una; el contenedor tiene 1 GB
     }
     return reply.type('text/html; charset=utf-8').header('cache-control', 'private, no-store').send(cache.get(key))
+  }
+  app.get('/p/:id', async (req, reply) => {
+    if (!req.user) return reply.redirect(`/?next=${encodeURIComponent(req.url)}`)
+    return sendRendered(reply, (await db.query(COLS + ' WHERE id = $1', [Number(req.params.id) || 0])).rows[0])
+  })
+  // / con sesión: la publicada (si se borró, la Web completa). Sin sesión: el login.
+  app.get('/', async (req, reply) => {
+    if (!req.user) return webDist && existsSync(webDist) ? reply.sendFile('index.html') : reply.code(404).send()
+    return sendRendered(reply, (await db.query(COLS + ' ORDER BY published DESC, is_fixed DESC LIMIT 1')).rows[0])
   })
 
   // Brochures: públicos, igual que hoy en GitHub Pages
@@ -170,10 +194,11 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
     app.register(fastifyStatic, { root: brochuresDir, prefix: '/brochures/', decorateReply: false })
   }
 
-  // Front (login, /, /admin). Las rutas del front devuelven index.html y el front decide qué mostrar.
+  // Front (login, /presentar, /admin). Devuelven index.html y el front decide qué mostrar.
   if (webDist && existsSync(webDist)) {
-    app.register(fastifyStatic, { root: webDist, prefix: '/', wildcard: false })
+    app.register(fastifyStatic, { root: webDist, prefix: '/', wildcard: false, index: false })
     app.get('/admin', (req, reply) => reply.sendFile('index.html'))
+    app.get('/presentar', (req, reply) => reply.sendFile('index.html'))
   }
 
   return app
