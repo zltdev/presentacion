@@ -396,13 +396,14 @@
   {
    "key": "PJW-019",
    "title": "Velocidad de carga: imágenes fuera del HTML, compresión y caché",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-019-velocidad",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "now",
    "priority": "p0",
    "description": "Las presentaciones y / pesan 27 MB porque las imágenes van en base64 dentro del HTML. Sacarlas a /api/img/:id (cacheables, en paralelo y con carga diferida), comprimir respuestas (brotli/gzip) y cachear los assets con hash. No toca index.html.",
-   "notes": "Pedido de Claudio (2026-10-16): las páginas cargan lento. La app es una SPA de React con API Fastify, no SSR; las presentaciones se renderizan en el servidor (cheerio) pero como un solo HTML gigante.",
+   "notes": "PR #14 en producción (2026-10-16): JS 236 a 74 KB con brotli, assets immutable, /p/:id de 27 MB a ~0,4 MB. Pendiente a futuro: achicar/convertir las fotos a WebP según el uso, y las miniaturas de YouTube (400 KB c/u) vía proxy. Pedido de Claudio (2026-10-16): las páginas cargan lento. La app es una SPA de React con API Fastify, no SSR; las presentaciones se renderizan en el servidor (cheerio) pero como un solo HTML gigante.",
    "depends_on": [
     "PJW-017"
    ],
