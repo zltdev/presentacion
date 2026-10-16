@@ -70,6 +70,10 @@ button { font: inherit; cursor: pointer }
 .els label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px }
 .els img { height: 64px; border-radius: 2px }
 .els label.off { opacity: .4 }
+.els label { position: relative }
+.star { position: absolute; top: 10px; right: 12px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(0,0,0,.55); color: #aaa; font-size: 16px; line-height: 28px; padding: 0 }
+.star.on { color: #f0c24b; background: rgba(0,0,0,.8) }
+.star:disabled { opacity: .3; cursor: default }
 .els label.off img { filter: grayscale(1) }
 .secs li.off { background: transparent; border: 1px dashed #3d3d42 }
 .secs li.off .t { color: var(--muted) }

@@ -144,14 +144,14 @@ function Builder ({ catalog, builder }) {
   useEffect(() => { load() }, [])
 
   const open = id => api(`/api/presentations/${id}`).then(json).then(d => { setP(d); setMsg('') })
-  const fresh = () => { setP({ name: '', lang: 'es', sections: catalog.sections.map(s => s.id), hidden: [] }); setMsg('') }
+  const fresh = () => { setP({ name: '', lang: 'es', sections: catalog.sections.map(s => s.id), hidden: [], pdf_photos: [] }); setMsg('') }
   const set = patch => setP(x => ({ ...x, ...patch }))
   const fail = e => setMsg(e.message)
 
   async function save (data = p) {
     // sin secciones el render muestra todo: eso es solo para la Web completa
     if (!data.sections.length) return setMsg('Elegí al menos una sección.')
-    const body = { name: data.name, lang: data.lang, sections: data.sections, hidden: data.hidden }
+    const body = { name: data.name, lang: data.lang, sections: data.sections, hidden: data.hidden, pdf_photos: data.pdf_photos }
     const r = data.id
       ? await api(`/api/presentations/${data.id}`, { method: 'PUT', body }).then(json)
       : await api('/api/presentations', { method: 'POST', body }).then(json)
@@ -205,6 +205,7 @@ function Builder ({ catalog, builder }) {
           <div className='row'>
             {builder && !p.is_fixed && <button className='btn' onClick={() => save().catch(fail)}>Guardar</button>}
             {p.id && <a className='btn alt' href={`/p/${p.id}`} target='_blank' rel='noreferrer'>Vista previa</a>}
+            {p.id && <a className='btn alt' href={`/api/presentations/${p.id}/pdf`} title='PDF de la última versión guardada'>Descargar PDF</a>}
             {p.id && !p.published && <button className='btn alt' onClick={publish}>Publicar</button>}
             {p.published && <span className='pub'>Publicada</span>}
             {builder && p.id && <button className='btn alt' onClick={duplicate}>Duplicar</button>}
@@ -231,6 +232,10 @@ function Sections ({ catalog, p, set }) {
     set({ sections: a })
   }
   const toggleEl = id => set({ hidden: hidden.has(id) ? p.hidden.filter(x => x !== id) : [...p.hidden, id] })
+  // fotos para el PDF: hasta 2 por sección; si no se marca ninguna, el PDF elige las de mayor resolución
+  const pdfPhotos = p.pdf_photos || []
+  const togglePdf = (sec, id) => set({ pdf_photos: pdfPhotos.includes(id) ? pdfPhotos.filter(x => x !== id) : [...pdfPhotos, id] })
+  const marked = sec => pdfPhotos.filter(id => id.startsWith(sec + ':')).length
   const btn = fn => e => { e.preventDefault(); fn() } // que no abra/cierre el <details>
 
   return (
@@ -261,6 +266,7 @@ function Sections ({ catalog, p, set }) {
                   <button title='Subir' disabled={!i} onClick={btn(() => move(i, -1))}>↑</button>
                   <button title='Bajar' disabled={i === chosen.length - 1} onClick={btn(() => move(i, 1))}>↓</button>
                 </summary>
+                {s.elements.some(e => e.thumb) && <p className='muted pad'>★ marca hasta 2 fotos para el PDF{marked(s.id) ? '' : ' (sin marcar: el PDF usa las de mayor resolución)'}</p>}
                 {s.elements.length
                   ? (
                     <div className='els'>
@@ -268,6 +274,16 @@ function Sections ({ catalog, p, set }) {
                         <label key={e.id} className={hidden.has(e.id) ? 'off' : ''} title={hidden.has(e.id) ? 'Oculto' : 'Visible'}>
                           <input type='checkbox' checked={!hidden.has(e.id)} onChange={() => toggleEl(e.id)} />
                           {e.thumb ? <img src={`/api/thumb/${encodeURIComponent(e.id)}`} alt={e.label} loading='lazy' /> : <span>{e.label}</span>}
+                          {e.thumb && (
+                            <button
+                              type='button'
+                              className={'star' + (pdfPhotos.includes(e.id) ? ' on' : '')}
+                              title={pdfPhotos.includes(e.id) ? 'Quitar del PDF' : marked(s.id) >= 2 ? 'Ya hay 2 fotos para el PDF en esta sección' : 'Usar en el PDF'}
+                              disabled={!pdfPhotos.includes(e.id) && marked(s.id) >= 2}
+                              onClick={ev => { ev.preventDefault(); togglePdf(s.id, e.id) }}
+                            >★
+                            </button>
+                          )}
                         </label>
                       ))}
                     </div>
