@@ -205,7 +205,7 @@ function Builder ({ catalog, builder }) {
           <div className='row'>
             {builder && !p.is_fixed && <button className='btn' onClick={() => save().catch(fail)}>Guardar</button>}
             {p.id && <a className='btn alt' href={`/p/${p.id}`} target='_blank' rel='noreferrer'>Vista previa</a>}
-            {p.id && <a className='btn alt' href={`/api/presentations/${p.id}/pdf`} title='PDF de la última versión guardada'>Descargar PDF</a>}
+            {builder && p.id && <a className='btn alt' href={`/api/presentations/${p.id}/pdf`} title='PDF de la última versión guardada'>Descargar PDF</a>}
             {p.id && !p.published && <button className='btn alt' onClick={publish}>Publicar</button>}
             {p.published && <span className='pub'>Publicada</span>}
             {builder && p.id && <button className='btn alt' onClick={duplicate}>Duplicar</button>}
