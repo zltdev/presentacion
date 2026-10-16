@@ -1,7 +1,7 @@
 {
  "meta": {
   "key_format": "PJW-### (prefijo PJW, número incremental con padding a 3 dígitos)",
-  "next_key": "PJW-019",
+  "next_key": "PJW-020",
   "naming_protocol": "Cada sesión de trabajo se asocia a UNA feature por su key. La branch se nombra <KEY>-slug. Ver CLAUDE.md sección 'Harness / sesiones'."
  },
  "features": [
@@ -248,12 +248,14 @@
   {
    "key": "PJW-012",
    "title": "Generación del PDF de una presentación",
-   "status": "pending",
+   "status": "in_progress",
+   "branch": "PJW-012-pdf-dossier",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "next",
    "priority": "p0",
    "target_date": "2026-11-02",
-   "description": "Playwright (Chromium) en el VPS imprime la presentación renderizada con CSS de impresión: galerías expandidas, videos como miniatura + link, sin controles. Mide el tamaño resultante.",
-   "notes": "Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Revisión hostinger-48 (2026-10-09): la imagen no trae Chromium ni sus libs; subir mem_limit de app a ~1.5g; escribir PDFs en /tmp (WORKDIR es de root, la app corre como node).",
+   "description": "PDF tipo dossier armado directo (sin navegador) con pdf-lib y sharp: una página por sección con logo, título, textos, etapas, video como miniatura con link y fotos achicadas. Respeta secciones, orden, elementos ocultos, idioma y textos corregidos de la presentación.",
+   "notes": "Decisión 2026-10-16: se descarta Chromium (pico 650 MB a 1,2 GB y PDF de 32 MB); prototipo directo 1,6 s, 1,4 MB. Facu/Claudio aprobaron el estilo dossier (no copia fiel de la web). Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Revisión hostinger-48 (2026-10-09): la imagen no trae Chromium ni sus libs; subir mem_limit de app a ~1.5g; escribir PDFs en /tmp (WORKDIR es de root, la app corre como node).",
    "depends_on": [
     "PJW-007",
     "PJW-003"
@@ -388,6 +390,27 @@
     "Cada sección, prendida o apagada, muestra su miniatura",
     "Abrir el armado no hace caer la app por memoria",
     "Click en la miniatura abre la sección en grande"
+   ],
+   "epic": "H-016"
+  },
+  {
+   "key": "PJW-019",
+   "title": "Velocidad de carga: imágenes fuera del HTML, compresión y caché",
+   "status": "in_progress",
+   "branch": "PJW-019-velocidad",
+   "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
+   "horizon": "now",
+   "priority": "p0",
+   "description": "Las presentaciones y / pesan 27 MB porque las imágenes van en base64 dentro del HTML. Sacarlas a /api/img/:id (cacheables, en paralelo y con carga diferida), comprimir respuestas (brotli/gzip) y cachear los assets con hash. No toca index.html.",
+   "notes": "Pedido de Claudio (2026-10-16): las páginas cargan lento. La app es una SPA de React con API Fastify, no SSR; las presentaciones se renderizan en el servidor (cheerio) pero como un solo HTML gigante.",
+   "depends_on": [
+    "PJW-017"
+   ],
+   "acceptance": [
+    "/p/:id pasa de ~27 MB a menos de 1 MB de HTML",
+    "Las imágenes se ven igual que antes",
+    "Los assets con hash y las imágenes se cachean un año",
+    "La respuesta HTML/JS/JSON viaja comprimida"
    ],
    "epic": "H-016"
   }
