@@ -165,3 +165,22 @@ test('velocidad: las presentaciones no llevan base64 (las imágenes van aparte y
   expect(gz.headers['content-encoding']).toBe('br')
   expect(gz.rawPayload.length).toBeLessThan(page.rawPayload.length / 2)
 })
+
+test('PDF de una presentación: lo baja el presentador, no el editor; fotos para el PDF hasta 2 por sección', async () => {
+  const cat = (await as.admin({ url: '/api/catalog' })).json()
+  const sec = cat.sections.find(s => s.project)
+  const [a, b, c] = sec.elements.filter(e => e.type === 'foto').map(e => e.id)
+  const body = { name: 'Dossier á é', lang: 'es', sections: [sec.id], pdf_photos: [a, b] }
+  expect((await as.presenter({ method: 'POST', url: '/api/presentations', payload: { ...body, pdf_photos: [a, b, c] } })).statusCode).toBe(400)
+  const { id } = (await as.presenter({ method: 'POST', url: '/api/presentations', payload: body })).json()
+  expect((await as.presenter({ url: `/api/presentations/${id}` })).json().pdf_photos).toEqual([a, b])
+
+  expect((await as.editor({ url: `/api/presentations/${id}/pdf` })).statusCode).toBe(403)
+  const r = await as.presenter({ url: `/api/presentations/${id}/pdf` })
+  expect(r.statusCode).toBe(200)
+  expect(r.headers['content-type']).toBe('application/pdf')
+  expect(r.headers['content-disposition']).toContain('ZLT-Dossier-a-e.pdf')
+  expect(r.rawPayload.subarray(0, 5).toString()).toBe('%PDF-')
+  expect((await as.presenter({ url: '/api/presentations/999999/pdf' })).statusCode).toBe(404)
+  await as.presenter({ method: 'DELETE', url: `/api/presentations/${id}` })
+}, 60000)

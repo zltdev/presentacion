@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { constants as zlib } from 'node:zlib'
 import { COOKIE, cookieOptions, login, logout, requireRole, userForToken } from './auth.js'
 import { buildCatalog, hash } from './catalog.js'
+import { buildPdf } from './pdf.js'
 import { renderPresentation } from './render.js'
 
 const PUBLIC_API = new Set(['/api/health', '/api/login'])
@@ -54,10 +55,16 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
 
     // Validación de lo que manda el admin. Devuelve el error o los campos limpios.
     const strings = a => Array.isArray(a) && a.every(x => typeof x === 'string')
-    function presentationFields ({ name, lang = 'es', sections = [], hidden = [] } = {}) {
+    function presentationFields ({ name, lang = 'es', sections = [], hidden = [], pdf_photos: photos = [] } = {}) {
       if (typeof name !== 'string' || !name.trim()) return { error: 'Falta el nombre.' }
-      if (!['es', 'en'].includes(lang) || !strings(sections) || !strings(hidden)) return { error: 'Datos inválidos.' }
-      return { name: name.trim(), lang, sections: JSON.stringify(sections), hidden: JSON.stringify(hidden) }
+      if (!['es', 'en'].includes(lang) || !strings(sections) || !strings(hidden) || !strings(photos)) return { error: 'Datos inválidos.' }
+      const perSection = {}
+      for (const id of photos) {
+        const sec = id.split(':')[0]
+        perSection[sec] = (perSection[sec] || 0) + 1
+        if (perSection[sec] > 2) return { error: 'Hasta 2 fotos por sección en el PDF.' }
+      }
+      return { name: name.trim(), lang, sections: JSON.stringify(sections), hidden: JSON.stringify(hidden), pdf_photos: JSON.stringify(photos) }
     }
     const builder = requireRole('admin', 'presenter')
     // La "Web completa" no se edita ni se borra
@@ -71,8 +78,8 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
       const f = presentationFields(req.body)
       if (f.error) return reply.code(400).send(f)
       const { rows: [p] } = await db.query(
-        'INSERT INTO presentations (name, lang, sections, hidden, created_by) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [f.name, f.lang, f.sections, f.hidden, req.user.id])
+        'INSERT INTO presentations (name, lang, sections, hidden, pdf_photos, created_by) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+        [f.name, f.lang, f.sections, f.hidden, f.pdf_photos, req.user.id])
       return reply.code(201).send(p)
     })
 
@@ -84,8 +91,8 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
     app.put('/api/presentations/:id', { preHandler: [builder, editable] }, async (req, reply) => {
       const f = presentationFields(req.body)
       if (f.error) return reply.code(400).send(f)
-      await db.query('UPDATE presentations SET name = $2, lang = $3, sections = $4, hidden = $5, updated_at = now() WHERE id = $1',
-        [req.params.id, f.name, f.lang, f.sections, f.hidden])
+      await db.query('UPDATE presentations SET name = $2, lang = $3, sections = $4, hidden = $5, pdf_photos = $6, updated_at = now() WHERE id = $1',
+        [req.params.id, f.name, f.lang, f.sections, f.hidden, f.pdf_photos])
       return { ok: true }
     })
 
@@ -240,6 +247,28 @@ export function buildApp ({ db, baseHtmlPath, webDist, brochuresDir, secureCooki
       const html = thumbCache.get(key)
       return reply.type('text/html; charset=utf-8').header('cache-control', 'private, max-age=300')
         .send('thumb' in req.query ? html.replace('</head>', '<style>#hdr{display:none!important}html{overflow:hidden}</style></head>') : html)
+    })
+
+    // PDF de una presentación (PJW-012): dibujado directo, de a uno por vez y con cache por versión
+    const pdfCache = new Map()
+    let pdfQueue = Promise.resolve()
+    app.get('/api/presentations/:id/pdf', { preHandler: builder }, async (req, reply) => {
+      const { rows: [p] } = await db.query('SELECT id, name, lang, sections, hidden, pdf_photos, updated_at FROM presentations WHERE id = $1', [Number(req.params.id) || 0])
+      if (!p) return reply.code(404).send({ error: 'Presentación inexistente.' })
+      const { rows: ov } = await db.query('SELECT element_id, lang, text, updated_at FROM text_overrides')
+      const key = `${p.id}:${+p.updated_at}:${ov.map(o => o.element_id + o.lang + +o.updated_at).join('|')}`
+      if (!pdfCache.has(key)) {
+        const overrides = {}
+        for (const o of ov) (overrides[o.element_id] ??= {})[o.lang] = o.text
+        baseHtml ??= readFileSync(baseHtmlPath, 'utf8')
+        const job = pdfQueue.then(() => pdfCache.get(key) ?? buildPdf({ baseHtml, presentation: { ...p, overrides }, photoIds: p.pdf_photos }))
+        pdfQueue = job.catch(() => {})
+        pdfCache.set(key, await job)
+        if (pdfCache.size > 3) pdfCache.delete(pdfCache.keys().next().value)
+      }
+      const slug = p.name.normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'presentacion'
+      return reply.type('application/pdf').header('content-disposition', `attachment; filename="ZLT-${slug}.pdf"`).header('cache-control', 'private, no-store')
+        .send(Buffer.from(pdfCache.get(key).bytes))
     })
 
     // Presentación renderizada. Sin sesión, al login (que vuelve acá después).

@@ -38,6 +38,8 @@ jobs:
           docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/api/health').then(r => r.json()).then(j => { console.log(j); process.exit(j.ok ? 0 : 1) })"
           docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/').then(r => { console.log('front', r.status); process.exit(r.ok ? 0 : 1) })"
           docker compose -f app/docker-compose.yml exec -T app node -e "fetch('http://localhost:3000/brochures/plazas-usa.pdf').then(r => { console.log('brochure', r.status); process.exit(r.ok ? 0 : 1) })"
+          # sharp trae un binario nativo: que cargue en la imagen real (PDF, PJW-012)
+          docker compose -f app/docker-compose.yml exec -T app node -e "import('sharp').then(m => m.default({ create: { width: 2, height: 2, channels: 3, background: '#fff' } }).png().toBuffer()).then(b => console.log('sharp ok', b.length))"
         env:
           POSTGRES_PASSWORD: ci-test
       - if: failure()
