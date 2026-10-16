@@ -248,14 +248,15 @@
   {
    "key": "PJW-012",
    "title": "Generación del PDF de una presentación",
-   "status": "in_progress",
+   "status": "in_review",
+   "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-012-pdf-dossier",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
    "horizon": "next",
    "priority": "p0",
    "target_date": "2026-11-02",
    "description": "PDF tipo dossier armado directo (sin navegador) con pdf-lib y sharp: una página por sección con logo, título, textos, etapas, video como miniatura con link y fotos achicadas. Respeta secciones, orden, elementos ocultos, idioma y textos corregidos de la presentación.",
-   "notes": "Decisión 2026-10-16: se descarta Chromium (pico 650 MB a 1,2 GB y PDF de 32 MB); prototipo directo 1,6 s, 1,4 MB. Facu/Claudio aprobaron el estilo dossier (no copia fiel de la web). Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Revisión hostinger-48 (2026-10-09): la imagen no trae Chromium ni sus libs; subir mem_limit de app a ~1.5g; escribir PDFs en /tmp (WORKDIR es de root, la app corre como node).",
+   "notes": "PR #15 en producción (2026-10-16): GET /api/presentations/:id/pdf, fotos con estrella en Administrar, auditoría de enlaces en tests. Pendiente: tapa/contratapa del cliente (SVG), mapas en negativo y probarlo con Facu/Conra. Decisión 2026-10-16: se descarta Chromium (pico 650 MB a 1,2 GB y PDF de 32 MB); prototipo directo 1,6 s, 1,4 MB. Facu/Claudio aprobaron el estilo dossier (no copia fiel de la web). Web app de presentaciones (T11). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp. Revisión hostinger-48 (2026-10-09): la imagen no trae Chromium ni sus libs; subir mem_limit de app a ~1.5g; escribir PDFs en /tmp (WORKDIR es de root, la app corre como node).",
    "depends_on": [
     "PJW-007",
     "PJW-003"
