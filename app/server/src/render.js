@@ -3,7 +3,8 @@ import { indexDocument, loadHtml } from './catalog.js'
 // Arma el HTML de una presentación a partir de index.html sin tocar el archivo base.
 // p = { sections: [ids en orden] (vacío = todas, "Web completa"), hidden: [ids de elementos],
 //       lang: 'es'|'en', overrides: { [textId]: { es?, en? } } }
-export function renderPresentation (html, p) {
+// mapUri(dataUri) => url: para servir las imágenes aparte en lugar de adentro del HTML
+export function renderPresentation (html, p, mapUri) {
   const $ = loadHtml(html)
   const hidden = new Set(p.hidden || [])
   const index = indexDocument($)
@@ -41,7 +42,7 @@ export function renderPresentation (html, p) {
     $('body').addClass('en')
     $('html').attr('lang', 'en')
   }
-  return $.restore($.html())
+  return $.restore($.html(), mapUri)
 }
 
 // El JS de la web cuenta las fotos solo, pero el total "/ N" y los puntos vienen fijos en el HTML

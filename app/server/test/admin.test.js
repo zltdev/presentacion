@@ -21,7 +21,7 @@ beforeAll(async () => {
     const email = `adm-${role}@zlt.test`
     await db.query('INSERT INTO users (email, name, role, password_hash) VALUES ($1, $1, $2, $3) ON CONFLICT DO NOTHING', [email, role, await hashPassword('x')])
     const r = await app.inject({ method: 'POST', url: '/api/login', payload: { email, password: 'x' } })
-    as[role] = (opts) => app.inject({ ...opts, headers: { cookie: `zlt_session=${r.cookies[0].value}` } })
+    as[role] = (opts) => app.inject({ ...opts, headers: { ...opts.headers, cookie: `zlt_session=${r.cookies[0].value}` } })
   }
 })
 afterAll(async () => { await app.close(); await db.end() })
@@ -146,4 +146,22 @@ test('avisos de cambios: lo guardado que ya no existe en index.html aparece y se
   expect((await as.editor({ url: '/api/changes' })).json().presentations.find(p => p.id === id)).toBeUndefined()
   await as.editor({ method: 'DELETE', url: '/api/texts/hero%3Atxt%3Aviejo/es' })
   await as.presenter({ method: 'DELETE', url: `/api/presentations/${id}` })
+})
+
+test('velocidad: las presentaciones no llevan base64 (las imágenes van aparte y cacheables) y viajan comprimidas', async () => {
+  const web = (await as.admin({ url: '/api/presentations' })).json().find(p => p.is_fixed)
+  const page = await as.admin({ url: `/p/${web.id}` })
+  expect(page.body).not.toMatch(/data:image\/[\w+.-]+;base64,/)
+  expect(page.body.length).toBeLessThan(1_000_000)
+  const src = /\/api\/img\/[0-9a-f]{20}/.exec(page.body)?.[0]
+  expect(src).toBeTruthy()
+  const img = await as.admin({ url: src })
+  expect(img.statusCode).toBe(200)
+  expect(img.headers['content-type']).toMatch(/^image\//)
+  expect(img.headers['cache-control']).toContain('immutable')
+  expect(img.rawPayload.length).toBeGreaterThan(500)
+  expect((await app.inject({ url: src })).statusCode).toBe(401) // sin sesión no se baja
+  const gz = await as.admin({ url: `/p/${web.id}`, headers: { 'accept-encoding': 'br, gzip' } })
+  expect(gz.headers['content-encoding']).toBe('br')
+  expect(gz.rawPayload.length).toBeLessThan(page.rawPayload.length / 2)
 })

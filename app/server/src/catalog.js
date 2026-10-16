@@ -32,7 +32,8 @@ const DATA_URI = /data:[\w/+.-]+;base64,[A-Za-z0-9+/=]+/g
 export function loadHtml (html) {
   const uris = []
   const $ = cheerio.load(html.replace(DATA_URI, u => `zltdata:${uris.push(u) - 1}`))
-  $.restore = s => s?.replace(/zltdata:(\d+)/g, (_, i) => uris[i])
+  // mapUri: qué poner en lugar de cada data: URI (por defecto, la misma)
+  $.restore = (s, mapUri = u => u) => s?.replace(/zltdata:(\d+)/g, (_, i) => mapUri(uris[i]))
   return $
 }
 
