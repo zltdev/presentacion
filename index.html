@@ -2270,5 +2270,43 @@ if(lb){lb.addEventListener('click',e=>{e.stopPropagation();document.getElementBy
   GATE.then(function () { setTimeout(finish, 30000); return Promise.all(all); }).then(function () { finish(); });
 })();
 </script>
+<script>
+/* ── Brochures en el idioma de la página ──
+   Cada brochure tiene su versión en español en brochures/<nombre>.pdf. Si en la misma
+   carpeta está la versión en inglés con el mismo nombre terminado en "-en.pdf"
+   (por ejemplo brochures/alamos-de-anelo-en.pdf), al ver el sitio en inglés el botón
+   descarga esa. Si todavía no existe, sigue descargando la de español. */
+(function () {
+  var links = [].slice.call(document.querySelectorAll('a[href]')).filter(function (a) {
+    return /^brochures\/[^\/?#]+\.pdf$/i.test(a.getAttribute('href') || '');
+  });
+  if (!links.length) return;
+  var hay = {};                                    // ruta en inglés → existe
+  links.forEach(function (a) {
+    a.dataset.brEs = a.getAttribute('href');
+    a.dataset.brEn = a.dataset.brEs.replace(/\.pdf$/i, '-en.pdf');
+  });
+  function enIngles() { return document.body.classList.contains('en'); }
+  function aplicar() {
+    var en = enIngles();
+    links.forEach(function (a) {
+      var usarEn = en && hay[a.dataset.brEn];
+      a.setAttribute('href', usarEn ? a.dataset.brEn : a.dataset.brEs);
+      a.setAttribute('hreflang', usarEn ? 'en' : 'es');
+    });
+  }
+  // se consulta una sola vez qué versiones en inglés están publicadas
+  var rutas = links.map(function (a) { return a.dataset.brEn; }).filter(function (r, i, l) { return l.indexOf(r) === i; });
+  rutas.forEach(function (r) {
+    if (!/^https?:$/.test(location.protocol)) return;
+    fetch(r, { method: 'HEAD', cache: 'no-store' })
+      .then(function (res) { hay[r] = res.ok && !/text\/html/i.test(res.headers.get('content-type') || ''); aplicar(); })
+      .catch(function () { });
+  });
+  // al cambiar de idioma (botón de la bandera) se actualizan los enlaces
+  new MutationObserver(aplicar).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  aplicar();
+})();
+</script>
 </body>
 </html>
