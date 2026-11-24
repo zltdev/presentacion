@@ -185,7 +185,7 @@
   {
    "key": "PJW-009",
    "title": "Admin: editor de textos globales",
-   "status": "in_review",
+   "status": "pending",
    "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-008-admin",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
@@ -193,7 +193,7 @@
    "priority": "p1",
    "target_date": "2026-10-28",
    "description": "Pantalla para que el editor (Conra) y el admin corrijan textos por elemento e idioma. Guarda el override con el hash del texto original; nunca modifica index.html. Permite volver al original.",
-   "notes": "PR #8 en producción (2026-10-13), falta que Facu lo pruebe (y en tablet). El presentador también corrige textos. Web app de presentaciones (T8). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Figuraba en curso sin PR abierto ni movimiento. Volvio a pendiente en la limpieza del 2026-11-24; si ya entro con otro PR, cerrala.",
    "depends_on": [
     "PJW-007"
    ],
