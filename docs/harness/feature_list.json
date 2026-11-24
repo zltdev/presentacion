@@ -225,7 +225,7 @@
   {
    "key": "PJW-011",
    "title": "Sync de index.html desde main y aviso de cambios",
-   "status": "in_review",
+   "status": "done",
    "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-011-sync",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
@@ -233,7 +233,7 @@
    "priority": "p1",
    "target_date": "2026-10-30",
    "description": "GitHub Action: en push a main que cambie index.html, subir el archivo al VPS y recargar el catálogo. El admin muestra qué elementos ocultos y textos corregidos dejaron de coincidir, para revisarlos. No modifica el flujo de Pages.",
-   "notes": "Workflow sync-index.yml (main) copia index.html a zltdev/webapp y eso dispara el deploy; avisos en Administrar (PR #13). Sync probado a mano 2026-10-13; falta confirmar el deploy en el VPS. Web app de presentaciones (T10). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Cerrada en la limpieza del 2026-11-24: su PR esta mergeado en el repo.",
    "depends_on": [
     "PJW-003",
     "PJW-006"
