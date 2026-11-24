@@ -162,7 +162,7 @@
   {
    "key": "PJW-008",
    "title": "Admin: armar presentaciones",
-   "status": "in_review",
+   "status": "done",
    "delivered_in_session": "8f350eea-1f5a-400b-a707-b989c9ee5b89",
    "branch": "PJW-008-admin",
    "worktree": "C:/Users/ClaudioIA/orca/workspaces/zlt-presentacion/webapp",
@@ -170,7 +170,7 @@
    "priority": "p0",
    "target_date": "2026-10-28",
    "description": "En /admin: listar, crear, duplicar, renombrar y borrar presentaciones (compartidas entre todos). Elegir y ordenar secciones, ocultar elementos con miniaturas, elegir idioma, vista previa. Presentación fija 'Web completa' (todas las secciones, no se puede borrar ni editar) que reemplaza a la web original tras el lanzamiento.",
-   "notes": "PR #8 en producción (2026-10-13), falta que Facu lo pruebe (y en tablet). El presentador también corrige textos. Web app de presentaciones (T7). Spec: docs/plan/webapp-spec.md en la rama zltdev/webapp.",
+   "notes": "Cerrada en la limpieza del 2026-11-24: su PR esta mergeado en el repo.",
    "depends_on": [
     "PJW-007"
    ],
